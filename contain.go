@@ -10,13 +10,6 @@ import (
 // It uses reflection to determine the type of 'a' and performs appropriate checks
 // for slice, array, map, struct, and string types. For a slice or an array,
 // it iterates over each element and uses reflect.DeepEqual to compare with 'b'.
-// For a map, it iterates over the keys and uses reflect.DeepEqual to compare
-// the value at each key with 'b'. For a struct, it iterates over its fields
-// and uses reflect.DeepEqual to compare each field with 'b'. For a string,
-// it uses strings.Contains to check if it contains 'b'.
-// For any other type, it panics with an unsupported type error.
-// If 'a' is a pointer or an interface, it recursively calls Contains on its dereferenced value.
-// Returns true if 'b' is found in 'a', false otherwise.
 //
 // Example usage:
 //
@@ -87,9 +80,7 @@ func NotContains(a, b any) bool {
 
 // ContainsIgnoreCase checks if the provided value 'b' is contained within the value 'a',
 // ignoring case sensitivity. It uses reflection to determine the type of 'a' and performs
-// appropriate checks for string types. If 'a' is a pointer or an interface, it recursively
-// calls ContainsIgnoreCase on its dereferenced value. Returns true if 'b' is found in 'a',
-// false otherwise.
+// appropriate checks for string types.
 //
 // Example usage:
 //
@@ -115,9 +106,7 @@ func ContainsIgnoreCase(a, b any) bool {
 
 // NotContainsIgnoreCase checks if the provided value 'b' is not contained within the value 'a',
 // ignoring case sensitivity. It uses reflection to determine the type of 'a' and performs
-// appropriate checks for string types. If 'a' is a pointer or an interface, it recursively
-// calls ContainsIgnoreCase on its dereferenced value. Returns true if 'b' is not found in 'a',
-// false otherwise.
+// appropriate checks for string types.
 //
 // Example Usage:
 //
@@ -130,11 +119,7 @@ func NotContainsIgnoreCase(a, b any) bool {
 
 // ContainsKey checks if the provided key 'key' is present in the value 'a'.
 // It uses reflection to determine the type of 'a' and performs appropriate checks
-// for struct and map types. For a struct, it checks if the field with the given
-// key exists in the struct. For a map, it checks if the map has a value associated
-// with the given key. If 'a' is a pointer or an interface, it recursively calls
-// ContainsKey on the dereferenced value. Returns true if the key is found in 'a',
-// false otherwise.
+// for struct and map types.
 //
 // Example Usage:
 //
@@ -171,10 +156,7 @@ func ContainsKey(a, key any) bool {
 }
 
 // NotContainsKey checks if the provided key 'key' is NOT present in the value 'a' by
-// negating the result of the ContainsKey function. It uses reflection to determine
-// the type of 'a' and performs appropriate checks for struct and map types. If 'a' is
-// a pointer or an interface, it recursively calls ContainsKey on the dereferenced value.
-// Returns true if the key is not found in 'a', false otherwise.
+// negating the result of the ContainsKey function.
 //
 // Example Usage:
 //
