@@ -1,3 +1,3 @@
-module github.com/play-innovat/go-comparator
+module github.com/tech4works/go-checker
 
 go 1.22
