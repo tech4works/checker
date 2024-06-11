@@ -31,20 +31,20 @@ func TestNonNil(t *testing.T) {
 }
 
 func TestAllNil(t *testing.T) {
-	for _, tc := range buildAllNilCases() {
-		t.Run(tc.name, func(t *testing.T) {
-			if got := AllNil(tc.args[0], tc.args[1:]...); got != tc.want {
-				t.Errorf("AllNil() = %v, want = %v", got, tc.want)
+	for _, tt := range buildAllNilCases() {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := AllNil(tt.args[0], tt.args[1]); got != tt.want {
+				t.Errorf("AllNil() = %v, want = %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestAllNonNil(t *testing.T) {
-	for _, tc := range buildAllNonNilCases() {
-		t.Run(tc.name, func(t *testing.T) {
-			if got := AllNonNil(tc.args[0], tc.args[1:]...); got != tc.want {
-				t.Errorf("AllNonNil() = %v, want = %v", got, tc.want)
+	for _, tt := range buildAllNonNilCases() {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := AllNonNil(tt.args[0], tt.args[1]); got != tt.want {
+				t.Errorf("AllNonNil() = %v, want = %v", got, tt.want)
 			}
 		})
 	}
@@ -73,7 +73,7 @@ func TestIsNotEmpty(t *testing.T) {
 func TestAllEmpty(t *testing.T) {
 	for _, tc := range buildAllEmptyCases() {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := AllEmpty(tc.args[0], tc.args[1:]...); got != tc.want {
+			if got := AllEmpty(tc.args[0], tc.args[1]); got != tc.want {
 				t.Errorf("AllEmpty() = %v, want = %v", got, tc.want)
 			}
 		})
@@ -83,7 +83,7 @@ func TestAllEmpty(t *testing.T) {
 func TestAllNotEmpty(t *testing.T) {
 	for _, tc := range buildAllNotEmptyCases() {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := AllNotEmpty(tc.args[0], tc.args[1:]...); got != tc.want {
+			if got := AllNotEmpty(tc.args[0], tc.args[1]); got != tc.want {
 				t.Errorf("AllNotEmpty() = %v, want = %v", got, tc.want)
 			}
 		})
@@ -113,7 +113,7 @@ func TestIsNotNilOrEmpty(t *testing.T) {
 func TestAllNilOrEmpty(t *testing.T) {
 	for _, tc := range buildAllNilOrEmptyCases() {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := AllNilOrEmpty(tc.args[0], tc.args[1:]...); got != tc.want {
+			if got := AllNilOrEmpty(tc.args[0], tc.args[1]); got != tc.want {
 				t.Errorf("AllNilOrEmpty() = %v, want = %v", got, tc.want)
 			}
 		})
@@ -123,7 +123,7 @@ func TestAllNilOrEmpty(t *testing.T) {
 func TestAllNotNilOrEmpty(t *testing.T) {
 	for _, tc := range buildAllNotNilOrEmptyCases() {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := AllNotNilOrEmpty(tc.args[0], tc.args[1:]...); got != tc.want {
+			if got := AllNotNilOrEmpty(tc.args[0], tc.args[1]); got != tc.want {
 				t.Errorf("AllNotNilOrEmpty() = %v, want = %v", got, tc.want)
 			}
 		})
@@ -245,31 +245,31 @@ func buildIsNotEmptyCases() []emptyCase {
 
 func buildAllEmptyCases() []emptyCase {
 	return []emptyCase{
-		{name: "EmptyString", args: []any{""}, want: true},
-		{name: "NonEmptyString", args: []any{"test"}, want: false},
-		{name: "EmptyIntSlice", args: []any{[]int{}}, want: true},
-		{name: "NonEmptyIntSlice", args: []any{[]int{1}}, want: false},
-		{name: "EmptyStringSlice", args: []any{[]string{}}, want: true},
-		{name: "NonEmptyStringSlice", args: []any{[]string{"test"}}, want: false},
-		{name: "EmptyStringMap", args: []any{map[string]string{}}, want: true},
-		{name: "NonEmptyStringMap", args: []any{map[string]string{"key": "value"}}, want: false},
-		{name: "EmptyStruct", args: []any{struct{}{}}, want: true},
-		{name: "NonEmptyStruct", args: []any{struct{ Name string }{Name: "test"}}, want: false},
+		{name: "EmptyString", args: []any{"", "", ""}, want: true},
+		{name: "NonEmptyString", args: []any{"test", "dsd", "123"}, want: false},
+		{name: "EmptyIntSlice", args: []any{[]int{}, []int{}, []int{}}, want: true},
+		{name: "NonEmptyIntSlice", args: []any{[]int{1, 2}, []int{1, 2}, []int{1, 2}}, want: false},
+		{name: "EmptyStringSlice", args: []any{[]string{}, []string{}, []string{}}, want: true},
+		{name: "NonEmptyStringSlice", args: []any{[]string{"test"}, []string{"test"}, []string{"test"}}, want: false},
+		{name: "EmptyStringMap", args: []any{map[string]string{}, map[string]string{}, map[string]string{}}, want: true},
+		{name: "NonEmptyStringMap", args: []any{map[string]string{"key": "value"}, map[string]string{"key": "value"}, map[string]string{"key": "value"}}, want: false},
+		{name: "EmptyStruct", args: []any{struct{}{}, struct{}{}, struct{}{}}, want: true},
+		{name: "NonEmptyStruct", args: []any{struct{ Name string }{Name: "test"}, struct{ Name string }{Name: "test"}, struct{ Name string }{Name: "test"}}, want: false},
 	}
 }
 
 func buildAllNotEmptyCases() []emptyCase {
 	return []emptyCase{
-		{name: "NonEmptyString", args: []any{"test"}, want: true},
-		{name: "EmptyString", args: []any{""}, want: false},
-		{name: "NonEmptyIntSlice", args: []any{[]int{1}}, want: true},
-		{name: "EmptyIntSlice", args: []any{[]int{}}, want: false},
-		{name: "NonEmptyStringSlice", args: []any{[]string{"test"}}, want: true},
-		{name: "EmptyStringSlice", args: []any{[]string{}}, want: false},
-		{name: "NonEmptyStringMap", args: []any{map[string]string{"key": "value"}}, want: true},
-		{name: "EmptyStringMap", args: []any{map[string]string{}}, want: false},
-		{name: "NonEmptyStruct", args: []any{struct{ Name string }{Name: "test"}}, want: true},
-		{name: "EmptyStruct", args: []any{struct{}{}}, want: false},
+		{name: "NonEmptyString", args: []any{"test", "test"}, want: true},
+		{name: "EmptyString", args: []any{"", ""}, want: false},
+		{name: "NonEmptyIntSlice", args: []any{[]int{1}, []int{1}}, want: true},
+		{name: "EmptyIntSlice", args: []any{[]int{}, []int{}}, want: false},
+		{name: "NonEmptyStringSlice", args: []any{[]string{"test"}, []string{"test"}}, want: true},
+		{name: "EmptyStringSlice", args: []any{[]string{}, []string{}}, want: false},
+		{name: "NonEmptyStringMap", args: []any{map[string]string{"key": "value"}, map[string]string{"key": "value"}}, want: true},
+		{name: "EmptyStringMap", args: []any{map[string]string{}, map[string]string{}}, want: false},
+		{name: "NonEmptyStruct", args: []any{struct{ Name string }{Name: "test"}, struct{ Name string }{Name: "test"}}, want: true},
+		{name: "EmptyStruct", args: []any{struct{}{}, struct{}{}}, want: false},
 	}
 }
 
