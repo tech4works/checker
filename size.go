@@ -1,7 +1,6 @@
 package checker
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -19,14 +18,7 @@ import (
 //
 // Returns true if the first value is greater than the second value, false otherwise.
 func IsGreaterThan(a, b any) bool {
-	reflectValueA := reflect.ValueOf(a)
-	reflectValueB := reflect.ValueOf(b)
-
-	if isNotNumericType(reflectValueA) || isNotNumericType(reflectValueB) {
-		panic(fmt.Sprintf("Unsupported type a: %s b: %s", reflectValueA.Kind().String(), reflectValueB.Kind().String()))
-	}
-
-	return toFloat64(reflectValueA) > toFloat64(reflectValueB)
+	return toFloat(a) > toFloat(b)
 }
 
 // IsGreaterThanOrEqual compares two values of any type and returns whether the first value is greater than or
@@ -82,6 +74,21 @@ func IsLessThanOrEqual(a, b any) bool {
 	return IsLessThan(a, b) || Equals(a, b)
 }
 
+// IsLengthEquals checks whether the length or size of two parameters, a and b, are equal.
+// It uses the toLen function to get the length of the parameters, which supports various data types.
+//
+// Example usage:
+//
+//	fmt.Println(IsLengthEquals("test", "test")) // Outputs: true
+//	fmt.Println(IsLengthEquals("test", 4)) // Outputs: true
+//	fmt.Println(IsLengthEquals("test", 1)) // Outputs: false
+//
+// Returns true if the length or size of a and b are equal, false otherwise.
+// Panic occurs if a and b are of unsupported types or if the channel, interface, or pointer is nil.
+func IsLengthEquals(a, b any) bool {
+	return toLength(reflect.ValueOf(a)) == toLength(reflect.ValueOf(b))
+}
+
 // IsLengthGreaterThan compares the length or size of two values of any type and returns whether the first value is
 // greater than the second value.
 // It uses the toLen function to get the length of the values, which supports various data types.
@@ -98,7 +105,7 @@ func IsLessThanOrEqual(a, b any) bool {
 // Returns true if the length or size of the first value is greater than the length or size of the second value,
 // false otherwise.
 func IsLengthGreaterThan(a, b any) bool {
-	return toLen(reflect.ValueOf(a)) > toLen(reflect.ValueOf(b))
+	return toLength(reflect.ValueOf(a)) > toLength(reflect.ValueOf(b))
 }
 
 // IsLengthGreaterThanOrEqual compares the length or size of two values of any type and returns whether the first value
@@ -121,7 +128,7 @@ func IsLengthGreaterThanOrEqual(a, b any) bool {
 	return IsLengthGreaterThan(a, b) || IsLengthEquals(a, b)
 }
 
-// IsLengthLessThan compares the length or size of two parameters, a and b, and returns whether the length of a is
+// IsLengthLessThan compares the length or size of two parameters, a and b, and returns whether the length of an is
 // less than the length of b. It uses the toLen function to get the length of the parameters, which supports various
 // data types.
 //
@@ -133,14 +140,14 @@ func IsLengthGreaterThanOrEqual(a, b any) bool {
 //	fmt.Println(IsLengthLessThan("test", 4)) // Outputs: false
 //	fmt.Println(IsLengthLessThan("test", 1)) // Outputs: false
 //
-// Returns true if the length or size of a is less than the length of b, false otherwise.
+// Returns true if the length or size of an is less than the length of b, false otherwise.
 // Panic occurs if a and b are of unsupported types or if the channel, interface, or pointer is nil.
 func IsLengthLessThan(a, b any) bool {
-	return toLen(reflect.ValueOf(a)) < toLen(reflect.ValueOf(b))
+	return toLength(reflect.ValueOf(a)) < toLength(reflect.ValueOf(b))
 }
 
 // IsLengthLessThanOrEqual compares the length or size of two parameters, a and b, and returns
-// whether the length of a is less than or equal to the length of b. It uses the IsLengthLessThan and IsLengthEquals
+// whether the length of an is less than or equal to the length of b. It uses the IsLengthLessThan and IsLengthEquals
 // functions to determine the comparison.
 //
 // Example usage:
@@ -151,7 +158,7 @@ func IsLengthLessThan(a, b any) bool {
 //	fmt.Println(IsLengthLessThanOrEqual("test", 4))                     // Outputs: false
 //	fmt.Println(IsLengthLessThanOrEqual("test", 1))                     // Outputs: false
 //
-// Returns true if the length or size of a is less than or equal to the length of b, false otherwise.
+// Returns true if the length or size of an is less than or equal to the length of b, false otherwise.
 // Panic occurs if a and b are of unsupported types or if the channel, interface, or pointer is nil.
 func IsLengthLessThanOrEqual(a, b any) bool {
 	return IsLengthLessThan(a, b) || IsLengthEquals(a, b)

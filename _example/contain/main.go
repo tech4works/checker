@@ -51,12 +51,12 @@ func main() {
 	fmt.Println(checker.NotContainsKey(studentData, "Address")) // Should return true.
 
 	fmt.Println("ContainsOnSlice results:")
-	fmt.Println(checker.ContainsOnSlice(studentsData, func(index student) bool {
-		return index.name == "John"
+	fmt.Println(checker.ContainsOnSlice(studentsData, func(index int, element student) bool {
+		return element.name == "John" || index == 0
 	})) //Should return true
 
 	fmt.Println("NotContainsOnSlice results:")
-	fmt.Println(checker.NotContainsOnSlice(studentsData, func(index student) bool {
-		return index.name == "Mike"
+	fmt.Println(checker.NotContainsOnSlice(studentsData, func(index int, element student) bool {
+		return element.name == "Mike"
 	})) //Should return true
 }

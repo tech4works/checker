@@ -29,7 +29,7 @@ import (
 //	strA := "Hello World"
 //	fmt.Println(Contains(strA, "World"))  // true
 func Contains(a, b any) bool {
-	validateContains(a)
+	validateContainsParams(a)
 
 	reflectValueA := reflect.ValueOf(a)
 	if reflectValueA.Kind() == reflect.Ptr || reflectValueA.Kind() == reflect.Interface {
@@ -53,31 +53,6 @@ func Contains(a, b any) bool {
 		strings.Contains(reflectValueA.String(), reflectValueB.String())
 }
 
-// NotContains returns true if the provided value 'b' is not contained within the value 'a'. It uses the Contains
-// function to determine if 'b' is contained within 'a' and negates the result. Returns false if 'b' is found in 'a',
-// true otherwise.
-//
-// Example usage:
-//
-//	sliceA := []int{1, 2, 3, 4}
-//	fmt.Println(NotContains(sliceA, 5))   // true
-//
-//	mapA := map[string]int{"one": 1, "two": 2, "three": 3}
-//	fmt.Println(NotContains(mapA, 4)) // true
-//
-//	type structA struct {
-//	    field1 int
-//	    field2 string
-//	}
-//	s := structA{field1: 1, field2: "value"}
-//	fmt.Println(NotContains(s, "notValue"))  // true
-//
-//	strA := "Hello World"
-//	fmt.Println(NotContains(strA, "Moon"))  // true
-func NotContains(a, b any) bool {
-	return !Contains(a, b)
-}
-
 // ContainsIgnoreCase checks if the provided value 'b' is contained within the value 'a',
 // ignoring case sensitivity. It uses reflection to determine the type of 'a' and performs
 // appropriate checks for string types.
@@ -88,7 +63,7 @@ func NotContains(a, b any) bool {
 //	fmt.Println(ContainsIgnoreCase(strA, "WORLD"))   // true
 //	fmt.Println(ContainsIgnoreCase(strA, "goodbye")) // false
 func ContainsIgnoreCase(a, b any) bool {
-	validateContainsIgnoreCase(a)
+	validateContainsIgnoreCaseParams(a)
 
 	reflectValueA := reflect.ValueOf(a)
 	if reflectValueA.Kind() == reflect.Ptr || reflectValueA.Kind() == reflect.Interface {
@@ -102,19 +77,6 @@ func ContainsIgnoreCase(a, b any) bool {
 
 	return reflectValueB.Kind() == reflect.String &&
 		strings.Contains(strings.ToLower(reflectValueA.String()), strings.ToLower(reflectValueB.String()))
-}
-
-// NotContainsIgnoreCase checks if the provided value 'b' is not contained within the value 'a',
-// ignoring case sensitivity. It uses reflection to determine the type of 'a' and performs
-// appropriate checks for string types.
-//
-// Example Usage:
-//
-//	strA := "Hello World"
-//	fmt.Println(NotContainsIgnoreCase(strA, "MOON"))  // true
-//	fmt.Println(NotContainsIgnoreCase(strA, "WORLD")) // false
-func NotContainsIgnoreCase(a, b any) bool {
-	return !ContainsIgnoreCase(a, b)
 }
 
 // ContainsKey checks if the provided key 'key' is present in the value 'a'.
@@ -135,7 +97,7 @@ func NotContainsIgnoreCase(a, b any) bool {
 //	fmt.Println(ContainsKey(s, "field1"))  // true
 //	fmt.Println(ContainsKey(s, "field3"))  // false
 func ContainsKey(a, key any) bool {
-	validateContainsKey(a)
+	validateContainsKeyParams(a)
 
 	reflectValue := reflect.ValueOf(a)
 	if reflectValue.Kind() == reflect.Ptr || reflectValue.Kind() == reflect.Interface {
@@ -153,26 +115,6 @@ func ContainsKey(a, key any) bool {
 	}
 
 	return reflectValue.Kind() == reflect.Map && reflectValue.MapIndex(reflectKey).IsValid()
-}
-
-// NotContainsKey checks if the provided key 'key' is NOT present in the value 'a' by
-// negating the result of the ContainsKey function.
-//
-// Example Usage:
-//
-//	mapA := map[string]int{"one": 1, "two": 2, "three": 3}
-//	fmt.Println(NotContainsKey(mapA, "four"))  // true
-//	fmt.Println(NotContainsKey(mapA, "one"))  // false
-//
-//	type structA struct {
-//	    field1 int
-//	    field2 string
-//	}
-//	s := structA{field1: 1, field2: "value"}
-//	fmt.Println(NotContainsKey(s, "field3"))  // true
-//	fmt.Println(NotContainsKey(s, "field1"))  // false
-func NotContainsKey(a, key any) bool {
-	return !ContainsKey(a, key)
 }
 
 // ContainsOnSlice checks if the provided value 'b' is found by the 'found' function when applied to the elements in the slice 'a'.
@@ -199,28 +141,11 @@ func ContainsOnSlice[T any](a []T, found func(index int, element T) bool) bool {
 	return false
 }
 
-// NotContainsOnSlice checks if the provided value 'b' is not contained within the slice 'a'
-// by using the ContainsOnSlice function and negating the result. Returns true if 'b' is not found in 'a',
-// false otherwise.
-//
-// Example usage:
-//
-//	sliceA := []int{1, 2, 3, 4}
-//	fmt.Println(NotContainsOnSlice(sliceA, func(index int, element int) bool {
-//	    return element == 5
-//	}))  // true
-//	fmt.Println(NotContainsOnSlice(sliceA, func(index int, element int) bool {
-//	    return element == 1
-//	}))  // false
-func NotContainsOnSlice[T any](a []T, found func(index int, element T) bool) bool {
-	return !ContainsOnSlice(a, found)
-}
-
-// validateContains validates the value 'a' to ensure it is a supported type for
+// validateContainsParams validates the value 'a' to ensure it is a supported type for
 // the Contains function. If 'a' is nil, it panics with the message "A is nil".
 // If 'a' is not one of the supported types (slice, array, map, struct, string),
 // it panics with a formatted string message indicating the unsupported type.
-func validateContains(a any) {
+func validateContainsParams(a any) {
 	reflectValueA := reflect.ValueOf(a)
 
 	if IsNil(a) {
@@ -232,10 +157,10 @@ func validateContains(a any) {
 	}
 }
 
-// validateContainsIgnoreCase validates the value 'a' to ensure it is not nil and of type string.
+// validateContainsIgnoreCaseParams validates the value 'a' to ensure it is not nil and of type string.
 // If 'a' is nil, it panics with the message "A is nil".
 // If 'a' is not of type string, it panics with a formatted message indicating the unsupported type.
-func validateContainsIgnoreCase(a any) {
+func validateContainsIgnoreCaseParams(a any) {
 	reflectValueA := reflect.ValueOf(a)
 
 	if IsNil(a) {
@@ -245,14 +170,14 @@ func validateContainsIgnoreCase(a any) {
 	}
 }
 
-// validateContainsKey validates the value 'a' to ensure it is a map or struct.
+// validateContainsKeyParams validates the value 'a' to ensure it is a map or struct.
 // If 'a' is nil, it panics with the message "A is nil".
 // If 'a' is neither a map nor a struct, it panics with a formatted string
 // indicating the unsupported type.
 // This function uses reflection to determine the type of 'a'.
-// It is used by the ContainsKey function to validate the input value before
+// It is used by the ContainsKey function to validateStringParams the input value before
 // checking if the key is present.
-func validateContainsKey(a any) {
+func validateContainsKeyParams(a any) {
 	reflectValueA := reflect.ValueOf(a)
 
 	if IsNil(a) {
