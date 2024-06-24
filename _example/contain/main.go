@@ -28,35 +28,16 @@ func main() {
 	fmt.Println(checker.Contains(studentsData, studentData)) // Should return true.
 	fmt.Println(checker.Contains(studentData, "John"))       // Should return true.
 
-	fmt.Println("NotContains results:")
-	fmt.Println(checker.NotContains(sliceData, 6))         // Should return true.
-	fmt.Println(checker.NotContains(mapData, "Four"))      // Should return true.
-	fmt.Println(checker.NotContains(stringData, "Python")) // Should return true.
-	fmt.Println(checker.NotContains(studentData, "Peter")) // Should return true.
-
 	fmt.Println("ContainsIgnoreCase results:")
 	fmt.Println(checker.ContainsIgnoreCase(stringData, "hello")) // Should return true.
 	fmt.Println(checker.ContainsIgnoreCase(stringData, "go"))    // Should return true.
-
-	fmt.Println("NotContainsIgnoreCase results:")
-	fmt.Println(checker.NotContainsIgnoreCase(stringData, "bye"))    // Should return true.
-	fmt.Println(checker.NotContainsIgnoreCase(stringData, "python")) // Should return true.
 
 	fmt.Println("ContainsKey results:")
 	fmt.Println(checker.ContainsKey(mapData, 2))          // Should return true.
 	fmt.Println(checker.ContainsKey(studentData, "Name")) // Should return true.
 
-	fmt.Println("NotContainsKey results:")
-	fmt.Println(checker.NotContainsKey(mapData, 4))             // Should return true.
-	fmt.Println(checker.NotContainsKey(studentData, "Address")) // Should return true.
-
 	fmt.Println("ContainsOnSlice results:")
 	fmt.Println(checker.ContainsOnSlice(studentsData, func(index int, element student) bool {
 		return element.name == "John" || index == 0
-	})) //Should return true
-
-	fmt.Println("NotContainsOnSlice results:")
-	fmt.Println(checker.NotContainsOnSlice(studentsData, func(index int, element student) bool {
-		return element.name == "Mike"
 	})) //Should return true
 }
