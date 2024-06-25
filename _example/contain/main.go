@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/tech4works/go-checker"
+	"github.com/tech4works/checker"
 )
 
 type student struct {
