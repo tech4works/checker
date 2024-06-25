@@ -178,6 +178,24 @@ func IsNumeric(a any) bool {
 	return regex.MatchString(toString(a))
 }
 
+// IsNumericSpace determines whether a given value is a numeric string or a string containing spaces only.
+// It uses the toString function to convert the input to string and a regular expression to check the converted string.
+//
+// Parameters:
+//   - a: Any value to be checked for a numeric or space only string.
+//   - regex: A compiled regular expression used for checking the string.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the value is a numeric or space only string.
+//
+// Example:
+//
+//	a := "123456"
+//	b := "123 456"
+//	c := "123abc"
+//	fmt.Println(IsNumericSpace(a)) // true
+//	fmt.Println(IsNumericSpace(b)) // true
+//	fmt.Println(IsNumericSpace(c)) // false
 func IsNumericSpace(a any) bool {
 	regex := regexp.MustCompile("^[0-9 ]+$")
 	return regex.MatchString(toString(a))
