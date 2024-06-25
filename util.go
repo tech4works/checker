@@ -154,6 +154,9 @@ func toTimeWithErr(a any) (time.Time, error) {
 		return time.Time{}, fmt.Errorf("cannot convert string to time.Time: Unknown format \"%s\"",
 			reflectValue.String())
 	default:
+		if reflectValue.Type() == reflect.TypeOf(time.Time{}) {
+			return reflectValue.Interface().(time.Time), nil
+		}
 		return time.Time{}, fmt.Errorf("cannot convert to time.Time from type: %s", reflectValue.Kind().String())
 	}
 }
