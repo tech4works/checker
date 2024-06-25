@@ -1,7 +1,6 @@
 package checker
 
 import (
-	"github.com/klassmann/cpfcnpj"
 	"golang.org/x/crypto/bcrypt"
 	"net"
 	"net/http"
@@ -243,14 +242,23 @@ func IsEmail(a any) bool {
 //
 // Example:
 //
-//	  w := "12345678909"
-//	  x := "Not a CPF"
-//	  fmt.Println(IsCPF(&w)) // true
-//	  fmt.Println(IsCPF(w)) // true
-//	  fmt.Println(IsCPF(x)) // false
-//		 fmt.Println(IsCPF(nil)) // panic
+//	w := "12345678909"
+//	x := "Not a CPF"
+//	fmt.Println(IsCPF(&w)) // true
+//	fmt.Println(IsCPF(w)) // true
+//	fmt.Println(IsCPF(x)) // false
+//	fmt.Println(IsCPF(nil)) // panic
 func IsCPF(a any) bool {
-	return cpfcnpj.ValidateCPF(toString(a))
+	s := removeNonDigits(toString(a))
+	if len(s) != 11 || allDigitsEqual(s) {
+		return false
+	}
+
+	weights1 := []int{10, 9, 8, 7, 6, 5, 4, 3, 2}
+	weights2 := []int{11, 10, 9, 8, 7, 6, 5, 4, 3, 2}
+
+	firstVerifier, secondVerifier := calculateVerifierDigits(s, weights1, weights2)
+	return firstVerifier == int(s[9]-'0') && secondVerifier == int(s[10]-'0')
 }
 
 // IsCNPJ checks the given value, converts it to string and determines whether it
@@ -276,7 +284,16 @@ func IsCPF(a any) bool {
 //	  fmt.Println(IsCNPJ(x)) // false
 //		 fmt.Println(IsCNPJ(nil)) // panic
 func IsCNPJ(a any) bool {
-	return cpfcnpj.ValidateCNPJ(toString(a))
+	s := removeNonDigits(toString(a))
+	if len(s) != 14 || allDigitsEqual(s) {
+		return false
+	}
+
+	weights1 := []int{5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
+	weights2 := []int{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
+
+	firstVerifier, secondVerifier := calculateVerifierDigits(s, weights1, weights2)
+	return firstVerifier == int(s[12]-'0') && secondVerifier == int(s[13]-'0')
 }
 
 // IsCPFOrCNPJ checks the given value, converts it to string and determines whether it

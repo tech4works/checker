@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -196,4 +197,45 @@ func timeNow() time.Time {
 func dateNow() time.Time {
 	now := time.Now()
 	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+}
+
+func removeNonDigits(input string) string {
+	regex, _ := regexp.Compile(`^[0-9]+`)
+	return regex.ReplaceAllString(input, "")
+}
+
+func allDigitsEqual(input string) bool {
+	for i := 1; i < len(input); i++ {
+		if input[i] != input[0] {
+			return false
+		}
+	}
+	return true
+}
+
+func calculateVerifierDigits(document string, weights1, weights2 []int) (int, int) {
+	sum1, sum2 := 0, 0
+	for i := 0; i < len(weights1); i++ {
+		num, _ := strconv.Atoi(string(document[i]))
+		sum1 += num * weights1[i]
+		sum2 += num * weights2[i]
+	}
+	num, _ := strconv.Atoi(string(document[len(weights1)]))
+	sum2 += num * weights2[len(weights1)]
+
+	firstVerifier := sum1 % 11
+	if firstVerifier < 2 {
+		firstVerifier = 0
+	} else {
+		firstVerifier = 11 - firstVerifier
+	}
+
+	secondVerifier := sum2 % 11
+	if secondVerifier < 2 {
+		secondVerifier = 0
+	} else {
+		secondVerifier = 11 - secondVerifier
+	}
+
+	return firstVerifier, secondVerifier
 }
