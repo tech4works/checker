@@ -8,30 +8,26 @@ import (
 	"time"
 )
 
-// IsJSON determines whether a given value represents valid JSON.
-// It takes a value of any type as its parameter, converts it to a byte slice using the toBytes function,
-// then tries to Unmarshal the byte slice into an arbitrary data type. If the unmarshalling process is
-// successful (i.e., JSON decoding returns no error), we determine that the input value can represent a JSON
-// and return true. Otherwise, we return false.
+// IsJSON checks if a given value can be a map or a slice in JSON format. It uses the IsMap and
+// IsSlice functions to check the given value and returns true if either function returns true.
 //
 // Parameters:
-//   - a: Any value to be evaluated for JSON validity.
+//   - a: The value of any type to be checked if it can be presented in JSON as map or slice
 //
 // Returns:
-//   - bool: A boolean value, `true` if the given value can represent a valid JSON and `false` otherwise.
-//
-// Panics:
-//   - If `a` is not convertible to a byte slice, a panic occurs as the underlying 'toBytes' function throws a panic.
+//   - bool: A boolean value indicating whether the value can be represented in JSON format as a map or a slice.
 //
 // Example:
 //
-//	var x string = "{\"name\":\"John\", \"age\":30, \"city\":\"New York\"}"
-//	var y string = "not json string"
-//	fmt.Println(IsJSON(x)) // true
-//	fmt.Println(IsJSON(y)) // false
+//	jsonMap := `{"key": "value"}`
+//	jsonArray := `[1, 2, 3]`
+//	notJson := `Not a JSON string`
+//
+//	fmt.Println(IsJSON(jsonMap)) // Outputs: true
+//	fmt.Println(IsJSON(jsonArray)) // Outputs: true
+//	fmt.Println(IsJSON(notJson)) // Outputs: false
 func IsJSON(a any) bool {
-	var js any
-	return json.Unmarshal(toBytes(a), &js) == nil
+	return IsMap(a) || IsSlice(a)
 }
 
 // IsMap determines whether a given value is a map type. It does this by attempting to unmarshal JSON from the given value's bytes representation.
@@ -154,9 +150,13 @@ func IsInt(a any) bool {
 //	var x string = "true"
 //	var y string = "false"
 //	var z string = "not boolean"
+//	var a int = 0
+//	var b int = 1
 //	fmt.Println(IsBool(x)) // true
 //	fmt.Println(IsBool(y)) // true
 //	fmt.Println(IsBool(z)) // false
+//	fmt.Println(IsBool(a)) // true
+//	fmt.Println(IsBool(b)) // true
 func IsBool(a any) bool {
 	_, err := strconv.ParseBool(toString(a))
 	return err == nil
@@ -331,32 +331,6 @@ func IsFuncType(a any) bool {
 // nil pointer is passed in. Always check for nil before passing pointers.
 func IsChanType(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Chan
-}
-
-// IsInterfaceType checks if the provided value is of interface type.
-//
-// This function uses the reflect package to inspect the kind of the given value.
-// If the kind is an interface, it means the value is an interface type and 'true' is returned;
-// otherwise, it returns 'false'.
-//
-// Parameters:
-//   - a: The value to be checked if it is an interface type. As the parameter is
-//     of type 'any', it can be any valid Go variable.
-//
-// Returns:
-//   - bool: A boolean value representing whether the provided value is an interface type or not.
-//
-// Example:
-//
-//	var x interface{} = "hello"
-//	y := 10
-//	fmt.Println(IsInterfaceType(x)) // true
-//	fmt.Println(IsInterfaceType(y)) // false
-//
-// Please note that the function does not handle nil pointers and can panic if a
-// nil pointer is passed in. Always check for nil before passing pointers.
-func IsInterfaceType(a any) bool {
-	return reflect.ValueOf(a).Kind() == reflect.Interface
 }
 
 // IsMapType checks whether the provided value is a map. It uses the reflect package

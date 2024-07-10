@@ -47,7 +47,6 @@ func toFloat(a any) float64 {
 // If the value is of a struct type, the function returns the number of fields in the struct.
 // If the value is of a string, array, slice, or map type, the function returns the length of the string, array, slice, or map.
 // If the value is of a complex type, the function returns the integer value of the real part of the complex number.
-// If the value is of a channel type, the function returns the length of the channel.
 // If the value is of an interface or pointer type, the function recursively calls itself with the dereferenced value.
 // If the value is not of a supported type, a panic is thrown.
 // Returns: The length or size of the value as an integer.
@@ -68,12 +67,6 @@ func toLength(a any) int {
 		return reflectValue.NumField()
 	case reflect.Complex64, reflect.Complex128:
 		return int(real(reflectValue.Complex()))
-	case reflect.Chan:
-		if reflectValue.IsNil() {
-			panic("Error getting the channel size, it is null!")
-		} else {
-			return reflectValue.Len()
-		}
 	case reflect.Interface, reflect.Pointer:
 		if reflectValue.IsNil() {
 			panic("Error getting the interface/pointer size, it is null!")
@@ -112,13 +105,16 @@ func toString(a any) string {
 		return strconv.FormatComplex(reflectValue.Complex(), 'g', -1, 64)
 	case reflect.Bool:
 		return strconv.FormatBool(reflectValue.Bool())
-	case reflect.Array, reflect.Slice, reflect.Map, reflect.Struct:
+	case reflect.Array, reflect.Slice:
 		if reflectValue.Type().Elem().Kind() == reflect.Uint8 {
 			return string(reflectValue.Bytes())
 		} else {
 			marshal, _ := json.Marshal(reflectValue.Interface())
 			return string(marshal)
 		}
+	case reflect.Map, reflect.Struct:
+		marshal, _ := json.Marshal(reflectValue.Interface())
+		return string(marshal)
 	case reflect.Ptr, reflect.Interface:
 		if reflectValue.IsNil() {
 			panic("Error getting a string, it is null!")
@@ -140,7 +136,8 @@ func toBytes(a any) []byte {
 }
 
 // toTimeWithErr converts a value of any type to a time.Time value and returns it along with an error.
-// If the value is of a numeric type (int, uint, float), it is converted to a Unix timestamp using time.Unix function.
+// If the value is of a numeric type (int, uint, float), it is converted to a UnixMilli timestamp using
+// time.UnixMilli function.
 // If the value is of a string type, multiple time layouts are tried using time.Parse function.
 // If the value is not of a numeric or string type, an error is returned.
 //
@@ -149,8 +146,9 @@ func toTimeWithErr(a any) (time.Time, error) {
 	reflectValue := reflect.ValueOf(a)
 	switch reflectValue.Kind() {
 	case reflect.String:
-		layouts := []string{time.ANSIC, time.UnixDate, time.RubyDate, time.RFC822, time.RFC822Z, time.RFC850,
-			time.RFC1123, time.RFC1123Z, time.RFC3339, time.Kitchen, time.Stamp}
+		layouts := []string{time.Layout, time.ANSIC, time.UnixDate, time.RubyDate, time.RFC822, time.RFC822Z,
+			time.RFC850, time.RFC1123, time.RFC1123Z, time.RFC3339, time.RFC3339Nano, time.Kitchen, time.Stamp,
+			time.DateTime, time.DateOnly, time.TimeOnly}
 		for _, layout := range layouts {
 			if t, err := time.Parse(layout, reflectValue.String()); err == nil {
 				return t, nil
@@ -159,11 +157,11 @@ func toTimeWithErr(a any) (time.Time, error) {
 		return time.Time{}, fmt.Errorf("cannot convert string to time.Time: Unknown format \"%s\"",
 			reflectValue.String())
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return time.Unix(reflectValue.Int(), 0), nil
+		return time.UnixMilli(reflectValue.Int()), nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return time.Unix(int64(reflectValue.Uint()), 0), nil
+		return time.UnixMilli(int64(reflectValue.Uint())), nil
 	case reflect.Float32, reflect.Float64:
-		return time.Unix(int64(reflectValue.Float()), 0), nil
+		return time.UnixMilli(int64(reflectValue.Float())), nil
 	default:
 		if reflectValue.Type() == reflect.TypeOf(time.Time{}) {
 			return reflectValue.Interface().(time.Time), nil
@@ -209,11 +207,18 @@ func dateNow() time.Time {
 	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 }
 
+// removeNonDigits removes all non-digit characters from the given string.
+// It uses regular expressions to find and replace non-digit characters with an empty string.
+// Returns the modified string with only digit characters remaining.
 func removeNonDigits(input string) string {
 	regex, _ := regexp.Compile(`[^0-9]`)
 	return regex.ReplaceAllString(input, "")
 }
 
+// allDigitsEqual checks if all characters in the input string are equal.
+// It iterates over the string and compares each character to the first character.
+// If any character is different, the function returns false.
+// Returns: Boolean value indicating if all characters in the input string are equal.
 func allDigitsEqual(input string) bool {
 	for i := 1; i < len(input); i++ {
 		if input[i] != input[0] {
@@ -223,6 +228,21 @@ func allDigitsEqual(input string) bool {
 	return true
 }
 
+// calculateVerifierDigits calculates the verifier digits for a given document using the provided weights.
+// It iterates over the document string and multiplies each digit by its corresponding weight from weights1 and weights2.
+// The sums of the products are then used to calculate the verifier digits.
+// The first verifier digit is calculated as the modulo of sum1 by 11.
+// If the result is less than 2, the first verifier digit is set to 0, otherwise it is set to 11 minus the result.
+// The second verifier digit is calculated in the same way using sum2.
+//
+// Parameters:
+//   - document: The document string for which the verifier digits calculated.
+//   - weights1: The weights for the first verifier digit calculation.
+//   - weights2: The weights for the second verifier digit calculation.
+//
+// Returns:
+//   - int: The calculated first verifier digit.
+//   - int: The calculated second verifier digit.
 func calculateVerifierDigits(document string, weights1, weights2 []int) (int, int) {
 	sum1, sum2 := 0, 0
 	for i := 0; i < len(weights1); i++ {

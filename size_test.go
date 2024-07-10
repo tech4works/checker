@@ -5,13 +5,16 @@ import (
 )
 
 type sizeCase struct {
-	name string
-	a    any
-	b    any
-	want bool
+	name  string
+	a     any
+	b     any
+	want  bool
+	panic bool
 }
 
 func TestIsGreaterThan(t *testing.T) {
+	f := 21.2
+	var p *any = nil
 	tests := []sizeCase{
 		{
 			name: "PositiveNumbers",
@@ -49,10 +52,53 @@ func TestIsGreaterThan(t *testing.T) {
 			b:    5.4,
 			want: true,
 		},
+		{
+			name: "Number String",
+			a:    "5.5",
+			b:    "5.4",
+			want: true,
+		},
+		{
+			name: "Number Pointer",
+			a:    &f,
+			b:    "5.4",
+			want: true,
+		},
+		{
+			name: "Number Uint",
+			a:    &f,
+			b:    uint(1),
+			want: true,
+		},
+		{
+			name:  "Invalid String",
+			a:     "sas",
+			b:     5.2,
+			panic: true,
+		},
+		{
+			name:  "Pointer nil",
+			a:     p,
+			b:     5.2,
+			panic: true,
+		},
+		{
+			name:  "Nil",
+			a:     nil,
+			b:     5.2,
+			panic: true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.panic {
+				defer func() {
+					if r := recover(); r == nil {
+						t.Errorf("The code did not panic")
+					}
+				}()
+			}
 			if got := IsGreaterThan(tt.a, tt.b); got != tt.want {
 				t.Errorf("IsGreaterThan() = %v, want = %v", got, tt.want)
 			}
@@ -196,6 +242,9 @@ func TestIsLessThanOrEqual(t *testing.T) {
 }
 
 func TestIsLengthEquals(t *testing.T) {
+	i := 5
+	var p *any = nil
+
 	tests := []equalsCase{
 		{
 			name: "SameTypeEqualSize",
@@ -251,10 +300,58 @@ func TestIsLengthEquals(t *testing.T) {
 			b:    []int{},
 			want: true,
 		},
+		{
+			name: "Uint",
+			a:    "",
+			b:    uint(0),
+			want: true,
+		},
+		{
+			name: "Struct",
+			a: struct {
+				a any
+				b any
+			}{
+				a: 1,
+				b: "test",
+			},
+			b:    2,
+			want: true,
+		},
+		{
+			name: "Complex",
+			a:    "",
+			b:    complex(32.1, 231.23),
+			want: false,
+		},
+		{
+			name:  "Pointer Nil",
+			a:     p,
+			b:     2,
+			panic: true,
+		},
+		{
+			name: "Pointer Integer",
+			a:    "asasa",
+			b:    &i,
+			want: true,
+		},
+		{
+			name:  "Nil",
+			a:     nil,
+			b:     2,
+			panic: true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); (r != nil) != tt.panic {
+					t.Errorf("IsLengthEquals() panic = %v, wantPanic = %v", r, tt.panic)
+				}
+			}()
+
 			if got := IsLengthEquals(tt.a, tt.b); got != tt.want {
 				t.Errorf("IsLengthEquals() = %v, want = %v", got, tt.want)
 			}

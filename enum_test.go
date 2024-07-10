@@ -13,7 +13,7 @@ func (m mockBaseEnum) IsEnumValid() bool {
 }
 
 func TestIsEnumValid(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{
 			name: "NonPointerNonInterfaceNonBaseEnum",
 			arg:  123,

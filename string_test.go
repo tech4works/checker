@@ -6,15 +6,8 @@ import (
 	"testing"
 )
 
-type testCase struct {
-	name  string
-	arg   any
-	want  bool
-	panic bool
-}
-
 func TestIsURL(t *testing.T) {
-	testCases := []testCase{
+	testCases := []baseCase{
 		{
 			name: "ValidHTTPURL",
 			arg:  "http://example.com",
@@ -70,7 +63,7 @@ func TestIsURL(t *testing.T) {
 }
 
 func TestIsURLPath(t *testing.T) {
-	testCases := []testCase{
+	testCases := []baseCase{
 		{
 			name: "path with one directory",
 			arg:  "/home",
@@ -131,7 +124,7 @@ func TestIsURLPath(t *testing.T) {
 }
 
 func TestIsHTTPMethod(t *testing.T) {
-	testCases := []testCase{
+	testCases := []baseCase{
 		{
 			name: "Get method",
 			arg:  http.MethodGet,
@@ -177,7 +170,7 @@ func TestIsHTTPMethod(t *testing.T) {
 }
 
 func TestIsAlpha(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{
 			name: "All Alphabetic Characters",
 			arg:  "ABCDE",
@@ -215,7 +208,7 @@ func TestIsAlpha(t *testing.T) {
 }
 
 func TestIsAlphaSpace(t *testing.T) {
-	testCases := []testCase{
+	testCases := []baseCase{
 		{
 			name: "AllAlphabets",
 			arg:  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -263,7 +256,8 @@ func TestIsAlphaSpace(t *testing.T) {
 }
 
 func TestIsNumeric(t *testing.T) {
-	tests := []testCase{
+	var p *any = nil
+	tests := []baseCase{
 		{name: "empty string", arg: ""},
 		{name: "letters", arg: "abc"},
 		{name: "numeric string", arg: "123", want: true},
@@ -273,7 +267,10 @@ func TestIsNumeric(t *testing.T) {
 		{name: "negative integer", arg: -123, want: true},
 		{name: "positive float", arg: 123.456, want: true},
 		{name: "zero", arg: 0, want: true},
-		{name: "Nil", panic: true},
+		{name: "uint", arg: uint(23), want: true},
+		{name: "complex", arg: complex(23.2, 231), want: true},
+		{name: "pointer nil", arg: p, panic: true},
+		{name: "nil", panic: true},
 	}
 
 	for _, tt := range tests {
@@ -294,7 +291,7 @@ func TestIsNumeric(t *testing.T) {
 }
 
 func TestIsNumericSpace(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{
 			name: "onlyDigits",
 			arg:  "12345678",
@@ -347,7 +344,7 @@ func TestIsNumericSpace(t *testing.T) {
 }
 
 func TestIsEmail(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{name: "ValidEmail", arg: "example@test.com", want: true},
 		{name: "EmailWithSubdomain", arg: "example.test@test.com", want: true},
 		{name: "NoTopLevelDomain", arg: "example@test"},
@@ -370,7 +367,7 @@ func TestIsEmail(t *testing.T) {
 }
 
 func TestIsCPF(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{
 			name: "ValidCPF",
 			arg:  "12101721007",
@@ -413,7 +410,7 @@ func TestIsCPF(t *testing.T) {
 }
 
 func TestIsCNPJ(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{
 			name: "ValidCNPJ",
 			arg:  "57309623000168",
@@ -451,7 +448,7 @@ func TestIsCNPJ(t *testing.T) {
 }
 
 func TestIsCPFOrCNPJ(t *testing.T) {
-	testCases := []testCase{
+	testCases := []baseCase{
 		{
 			name: "Expect success when input is a valid CPF",
 			arg:  "58033473029",
@@ -504,7 +501,7 @@ func TestIsCPFOrCNPJ(t *testing.T) {
 }
 
 func TestIsBase64(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{
 			name: "ValidBase64",
 			arg:  "SGVsbG8gd29ybGQ=",
@@ -558,7 +555,7 @@ func TestIsBCrypt(t *testing.T) {
 	hashed, _ := bcrypt.GenerateFromPassword([]byte("ValidPassword"), bcrypt.DefaultCost)
 	invalid := []byte("InvalidPassword")
 
-	testCases := []testCase{
+	testCases := []baseCase{
 		{
 			name: "valid bcrypt",
 			arg:  hashed,
@@ -573,6 +570,11 @@ func TestIsBCrypt(t *testing.T) {
 			name: "valid bcrypt pointer",
 			arg:  &hashed,
 			want: true,
+		},
+		{
+			name: "empty string",
+			arg:  "",
+			want: false,
 		},
 		{
 			name: "invalid bcrypt",
@@ -602,7 +604,7 @@ func TestIsBCrypt(t *testing.T) {
 }
 
 func TestIsBearer(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{
 			name: "EmptyStr",
 			arg:  "",
@@ -645,7 +647,7 @@ func TestIsBearer(t *testing.T) {
 }
 
 func TestIsPrivateIP(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{"Empty", "", false, false},
 		{"Public IPv4", "8.8.8.8", false, false},
 		{"Reserved IPv4", "192.168.0.1", true, false},
@@ -653,6 +655,7 @@ func TestIsPrivateIP(t *testing.T) {
 		{"Public IPv6", "2001:4860:4860::8888", false, false},
 		{"Loopback IPv6", "::1", true, false},
 		{"Invalid", "invalid", false, false},
+		{"Empty", "", false, false},
 		{"Nil", nil, false, true},
 	}
 	for _, tt := range tests {
@@ -678,7 +681,7 @@ func TestIsPrivateIP(t *testing.T) {
 }
 
 func TestIsFullName(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{name: "Valid Full Name", arg: "John Doe", want: true},
 		{name: "Valid Full Name with special char", arg: "John O'Conner", want: true},
 		{name: "Full Name with numeric char", arg: "John2 Doe", want: false},
@@ -701,7 +704,7 @@ func TestIsFullName(t *testing.T) {
 }
 
 func TestIsIOSDeviceId(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{
 			name: "Valid IOS device Id",
 			arg:  "E241F78F-9477-42B5-A452-2F31E7F20E62",
@@ -740,7 +743,7 @@ func TestIsIOSDeviceId(t *testing.T) {
 }
 
 func TestIsAndroidDeviceId(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{
 			name:  "nil input",
 			arg:   nil,
@@ -790,7 +793,7 @@ func TestIsAndroidDeviceId(t *testing.T) {
 }
 
 func TestIsMobileDeviceId(t *testing.T) {
-	tests := []testCase{
+	tests := []baseCase{
 		{
 			name: "EmptyString",
 			arg:  "",
@@ -828,7 +831,7 @@ func TestIsMobileDeviceId(t *testing.T) {
 }
 
 func TestIsMobilePlatform(t *testing.T) {
-	testCases := []testCase{
+	testCases := []baseCase{
 		{name: "AndroidPlatform", arg: "Android", want: true},
 		{name: "iOSPlatform", arg: "iOS", want: true},
 		{name: "iPhoneOS", arg: "iPhone Os", want: true},
