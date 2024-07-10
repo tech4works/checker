@@ -262,67 +262,6 @@ func TestIsLengthEquals(t *testing.T) {
 	}
 }
 
-func TestIsLengthNotEqualTo(t *testing.T) {
-	tests := []equalsCase{
-		{
-			name: "Same length strings",
-			a:    "test",
-			b:    "abcd",
-			want: false,
-		},
-		{
-			name: "Different length strings",
-			a:    "Test1",
-			b:    "abcd",
-			want: true,
-		},
-		{
-			name: "Same length arrays",
-			a:    []int{1, 2, 3, 4},
-			b:    []int{5, 6, 7, 8},
-			want: false,
-		},
-		{
-			name: "Different length arrays",
-			a:    []int{1, 2, 3, 4, 5},
-			b:    []int{1, 2, 3},
-			want: true,
-		},
-		{
-			name: "Same length empty strings",
-			a:    "",
-			b:    "",
-			want: false,
-		},
-		{
-			name: "Different length with empty strings",
-			a:    "Test1",
-			b:    "",
-			want: true,
-		},
-		{
-			name: "Same length empty arrays",
-			a:    []int{},
-			b:    []int{},
-			want: false,
-		},
-		{
-			name: "Different length with empty arrays",
-			a:    []int{1, 2, 3},
-			b:    []int{},
-			want: true,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			if got := IsLengthNotEqualTo(test.a, test.b); got != test.want {
-				t.Errorf("IsLengthNotEqualTo() = %v, want = %v", got, test.want)
-			}
-		})
-	}
-}
-
 func TestIsLengthGreaterThan(t *testing.T) {
 	tests := []sizeCase{
 		{

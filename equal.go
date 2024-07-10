@@ -24,6 +24,16 @@ import (
 //
 // Returns true if a and b are deeply equal, false otherwise.
 func Equals(a, b any) bool {
+	reflectValueA := reflect.ValueOf(a)
+	if (reflectValueA.Kind() == reflect.Ptr || reflectValueA.Kind() == reflect.Interface) && !reflectValueA.IsNil() {
+		return Equals(reflectValueA.Elem().Interface(), b)
+	}
+
+	reflectValueB := reflect.ValueOf(b)
+	if (reflectValueB.Kind() == reflect.Ptr || reflectValueB.Kind() == reflect.Interface) && !reflectValueB.IsNil() {
+		return Equals(a, reflectValueB.Elem().Interface())
+	}
+
 	return reflect.DeepEqual(a, b)
 }
 

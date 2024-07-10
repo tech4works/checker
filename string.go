@@ -52,11 +52,13 @@ func IsURL(a any) bool {
 //
 //	fmt.Println(IsURLPath("/test/abc")) // true
 //	fmt.Println(IsURLPath("/sas-as/asa_asa/abc")) // true
+//	fmt.Println(IsURLPath("/sas-as/asa_asa/abc/")) // true
 //	fmt.Println(IsURLPath("not/a/path")) // false
-//	fmt.Println(IsURLPath("not/a/path/")) // false
+//	fmt.Println(IsURLPath("not/a/path?document=12345")) // false
 func IsURLPath(a any) bool {
-	regex := regexp.MustCompile(`^/([^/\s]*)+(/[^/\s]+)*$`)
-	return regex.MatchString(toString(a))
+	s := toString(a)
+	regex := regexp.MustCompile(`^(/[^/?\s]*)*$`)
+	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
 // IsHTTPMethod checks if a given value matches a known HTTP method. It first converts the value to a string, then
@@ -173,7 +175,7 @@ func IsAlphaSpace(a any) bool {
 //	fmt.Println(IsNumeric([]int{1, 2, 3})) // panic
 //	fmt.Println(IsNumeric(nil)) // panic
 func IsNumeric(a any) bool {
-	regex := regexp.MustCompile("^[0-9]+$")
+	regex := regexp.MustCompile("^[-.0-9]+$")
 	return regex.MatchString(toString(a))
 }
 
@@ -344,8 +346,9 @@ func IsCPFOrCNPJ(a any) bool {
 //	fmt.Println(IsBase64(validBase64)) // true
 //	fmt.Println(IsBase64(invalidBase64)) // false
 func IsBase64(a any) bool {
+	s := toString(a)
 	regex := regexp.MustCompile(`^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$`)
-	return regex.MatchString(toString(a))
+	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
 // IsBCrypt determines whether a given value represents a valid bcrypt cost.
@@ -397,8 +400,8 @@ func IsBCrypt(a any) bool {
 //	fmt.Println(IsBearer(x)) // true
 //	fmt.Println(IsBearer(y)) // false
 func IsBearer(a any) bool {
-	const bearer = "Bearer "
-	split := strings.Split(toString(a), bearer)
+	const bearer = "Bearer"
+	split := strings.Split(toString(a), " ")
 	return len(split) > 0 && split[0] == bearer
 }
 
@@ -484,8 +487,9 @@ func IsPrivateIP(a any) bool {
 //	fmt.Println(IsFullName(name)) // true
 //	fmt.Println(IsFullName(invalidName)) // false
 func IsFullName(a any) bool {
+	s := toString(a)
 	regex := regexp.MustCompile(`^[\p{L}\s'-]+$`)
-	return regex.MatchString(toString(a))
+	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
 // IsIOSDeviceId determines whether a given value adheres to the standard UUID format typically used in iOS device IDs.
@@ -509,8 +513,9 @@ func IsFullName(a any) bool {
 //	fmt.Println(IsIOSDeviceId(id1)) // true
 //	fmt.Println(IsIOSDeviceId(id2)) // false
 func IsIOSDeviceId(a any) bool {
-	regex := regexp.MustCompile(`[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}`)
-	return regex.MatchString(toString(a))
+	s := toString(a)
+	regex := regexp.MustCompile(`^[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}$`)
+	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
 // IsAndroidDeviceId determines whether a given value adheres to the standard format typically used in Android device IDs.
@@ -534,8 +539,9 @@ func IsIOSDeviceId(a any) bool {
 //	fmt.Println(IsAndroidDeviceId(id1)) // true
 //	fmt.Println(IsAndroidDeviceId(id2)) // false
 func IsAndroidDeviceId(a any) bool {
-	regex := regexp.MustCompile(`[0-9a-fA-F]`)
-	return regex.MatchString(toString(a))
+	s := toString(a)
+	regex := regexp.MustCompile(`^[a-fA-F0-9]{16}$`)
+	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
 // IsMobileDeviceId determines whether a given value is a valid Mobile Device ID.

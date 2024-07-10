@@ -19,6 +19,12 @@ func toFloat(a any) float64 {
 	reflectValue := reflect.ValueOf(a)
 
 	switch reflectValue.Kind() {
+	case reflect.String:
+		f, err := strconv.ParseFloat(reflectValue.String(), 64)
+		if err != nil {
+			panic(fmt.Sprintf("Error getting float by string: %s", reflectValue.String()))
+		}
+		return f
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return float64(reflectValue.Int())
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
@@ -50,6 +56,8 @@ func toLength(a any) int {
 	reflectValue := reflect.ValueOf(a)
 
 	switch reflectValue.Kind() {
+	case reflect.String, reflect.Array, reflect.Slice, reflect.Map:
+		return reflectValue.Len()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return int(reflectValue.Int())
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
@@ -58,8 +66,6 @@ func toLength(a any) int {
 		return int(reflectValue.Float())
 	case reflect.Struct:
 		return reflectValue.NumField()
-	case reflect.String, reflect.Array, reflect.Slice, reflect.Map:
-		return reflectValue.Len()
 	case reflect.Complex64, reflect.Complex128:
 		return int(real(reflectValue.Complex()))
 	case reflect.Chan:
@@ -97,9 +103,9 @@ func toString(a any) string {
 	case reflect.String:
 		return reflectValue.String()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return strconv.FormatInt(reflectValue.Int(), 64)
+		return strconv.FormatInt(reflectValue.Int(), 10)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return strconv.FormatUint(reflectValue.Uint(), 64)
+		return strconv.FormatUint(reflectValue.Uint(), 10)
 	case reflect.Float32, reflect.Float64:
 		return strconv.FormatFloat(reflectValue.Float(), 'g', -1, 64)
 	case reflect.Complex64, reflect.Complex128:
@@ -107,8 +113,12 @@ func toString(a any) string {
 	case reflect.Bool:
 		return strconv.FormatBool(reflectValue.Bool())
 	case reflect.Array, reflect.Slice, reflect.Map, reflect.Struct:
-		marshal, _ := json.Marshal(reflectValue.Interface())
-		return string(marshal)
+		if reflectValue.Type().Elem().Kind() == reflect.Uint8 {
+			return string(reflectValue.Bytes())
+		} else {
+			marshal, _ := json.Marshal(reflectValue.Interface())
+			return string(marshal)
+		}
 	case reflect.Ptr, reflect.Interface:
 		if reflectValue.IsNil() {
 			panic("Error getting a string, it is null!")
@@ -138,12 +148,6 @@ func toBytes(a any) []byte {
 func toTimeWithErr(a any) (time.Time, error) {
 	reflectValue := reflect.ValueOf(a)
 	switch reflectValue.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return time.Unix(reflectValue.Int(), 0), nil
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return time.Unix(int64(reflectValue.Uint()), 0), nil
-	case reflect.Float32, reflect.Float64:
-		return time.Unix(int64(reflectValue.Float()), 0), nil
 	case reflect.String:
 		layouts := []string{time.ANSIC, time.UnixDate, time.RubyDate, time.RFC822, time.RFC822Z, time.RFC850,
 			time.RFC1123, time.RFC1123Z, time.RFC3339, time.Kitchen, time.Stamp}
@@ -154,6 +158,12 @@ func toTimeWithErr(a any) (time.Time, error) {
 		}
 		return time.Time{}, fmt.Errorf("cannot convert string to time.Time: Unknown format \"%s\"",
 			reflectValue.String())
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return time.Unix(reflectValue.Int(), 0), nil
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return time.Unix(int64(reflectValue.Uint()), 0), nil
+	case reflect.Float32, reflect.Float64:
+		return time.Unix(int64(reflectValue.Float()), 0), nil
 	default:
 		if reflectValue.Type() == reflect.TypeOf(time.Time{}) {
 			return reflectValue.Interface().(time.Time), nil
@@ -200,7 +210,7 @@ func dateNow() time.Time {
 }
 
 func removeNonDigits(input string) string {
-	regex, _ := regexp.Compile(`^[0-9]+`)
+	regex, _ := regexp.Compile(`[^0-9]`)
 	return regex.ReplaceAllString(input, "")
 }
 

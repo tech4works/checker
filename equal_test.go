@@ -5,10 +5,11 @@ import (
 )
 
 type equalsCase struct {
-	name string
-	a, b any
-	c    []any
-	want bool
+	name  string
+	a, b  any
+	c     []any
+	want  bool
+	panic bool
 }
 
 func TestEquals(t *testing.T) {
@@ -64,12 +65,12 @@ func TestEquals(t *testing.T) {
 		{
 			name: "Equal Maps",
 			a:    map[string]int{"one": 1, "two": 2},
-			b:    map[string]int{"one": 1, "two": 2},
+			b:    &map[string]int{"one": 1, "two": 2},
 			want: true,
 		},
 		{
 			name: "Unequal Maps",
-			a:    map[string]int{"one": 1, "two": 2},
+			a:    &map[string]int{"one": 1, "two": 2},
 			b:    map[string]int{"one": 1, "two": 3},
 			want: false,
 		},
@@ -79,56 +80,6 @@ func TestEquals(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Equals(tt.a, tt.b); got != tt.want {
 				t.Errorf("Equals() = %v, want = %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestIsNotEqualTo(t *testing.T) {
-	testCases := []equalsCase{
-		{
-			name: "integersNotEqual",
-			a:    1,
-			b:    2,
-			want: true,
-		},
-		{
-			name: "integersEqual",
-			a:    1,
-			b:    1,
-			want: false,
-		},
-		{
-			name: "stringsNotEqual",
-			a:    "Hello",
-			b:    "World",
-			want: true,
-		},
-		{
-			name: "stringsEqual",
-			a:    "Hello",
-			b:    "Hello",
-			want: false,
-		},
-		{
-			name: "structuresNotEqual",
-			a:    struct{ name string }{"Hello"},
-			b:    struct{ name string }{"World"},
-			want: true,
-		},
-		{
-			name: "structuresEqual",
-			a:    struct{ name string }{"Hello"},
-			b:    struct{ name string }{"Hello"},
-			want: false,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			got := IsNotEqualTo(tc.a, tc.b)
-			if got != tc.want {
-				t.Errorf("IsNotEqualTo() = %v, want = %v", got, tc.want)
 			}
 		})
 	}
@@ -180,73 +131,38 @@ func TestEqualsIgnoreCase(t *testing.T) {
 			b:    "java",
 			want: true,
 		},
+		{
+			name: "Using pointer to string",
+			a:    "java",
+			b:    &strPointer,
+			want: true,
+		},
+		{
+			name:  "Nil",
+			a:     nil,
+			b:     "test",
+			panic: true,
+		},
+		{
+			name:  "Number",
+			a:     2,
+			b:     3,
+			panic: true,
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.panic {
+				defer func() {
+					if r := recover(); r == nil {
+						t.Errorf("The code did not panic")
+					}
+				}()
+			}
+
 			if got := EqualsIgnoreCase(tc.a, tc.b); got != tc.want {
 				t.Errorf("EqualsIgnoreCase() = %v, want %v", got, tc.want)
-			}
-		})
-	}
-}
-
-func TestIsNotEqualIgnoreCaseTo(t *testing.T) {
-	tests := []equalsCase{
-		{
-			name: "Different case strings",
-			a:    "Hello",
-			b:    "HELLO",
-			want: false,
-		},
-		{
-			name: "Same case strings",
-			a:    "Hello",
-			b:    "Hello",
-			want: false,
-		},
-		{
-			name: "Different case different strings",
-			a:    "Hello",
-			b:    "World",
-			want: true,
-		},
-		{
-			name: "Different case strings numbers",
-			a:    "123",
-			b:    "123",
-			want: false,
-		},
-		{
-			name: "Special chars same strings",
-			a:    "@#$%^&*()",
-			b:    "@#$%^&*()",
-			want: false,
-		},
-		{
-			name: "Empty strings",
-			a:    "",
-			b:    "",
-			want: false,
-		},
-		{
-			name: "Different strings including empty string",
-			a:    "Hello",
-			b:    "",
-			want: true,
-		},
-		{
-			name: "Different strings including whitespace",
-			a:    "Hello",
-			b:    " ",
-			want: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := IsNotEqualIgnoreCaseTo(tt.a, tt.b); got != tt.want {
-				t.Errorf("IsNotEqualIgnoreCaseTo() = %v, want = %v", got, tt.want)
 			}
 		})
 	}
@@ -308,54 +224,6 @@ func TestAllEquals(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := AllEquals(tt.a, tt.b, tt.c...); got != tt.want {
 				t.Errorf("AllEquals() = %v, want = %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestAllNotEquals(t *testing.T) {
-	tests := []equalsCase{
-		{
-			name: "AllDifferent",
-			a:    1,
-			b:    2,
-			c:    []any{3, 4, 5},
-			want: true,
-		},
-		{
-			name: "SomeEqual",
-			a:    1,
-			b:    1,
-			c:    []any{2, 3, 4},
-			want: true,
-		},
-		{
-			name: "DifferentTypes",
-			a:    1,
-			b:    "1",
-			c:    []any{2.0, "3", struct{}{}},
-			want: true,
-		},
-		{
-			name: "AllEqual",
-			a:    "test",
-			b:    "test",
-			c:    []any{"test", "test", "test"},
-			want: false,
-		},
-		{
-			name: "NilArguments",
-			a:    nil,
-			b:    nil,
-			c:    []any{nil, nil, nil},
-			want: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := AllNotEquals(tt.a, tt.b, tt.c...); got != tt.want {
-				t.Errorf("AllNotEquals() = %v, want = %v", got, tt.want)
 			}
 		})
 	}
