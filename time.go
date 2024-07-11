@@ -1,3 +1,25 @@
+//	MIT License
+//
+//	Copyright (c) 2024 Gabriel Henrique Cataldo Moskorz
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a copy
+//	of this software and associated documentation files (the "Software"), to deal
+//	in the Software without restriction, including without limitation the rights
+//	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//	copies of the Software, and to permit persons to whom the Software is
+//	furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in all
+//	copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//	SOFTWARE.
+
 package checker
 
 // IsBeforeNow determines whether a given time is before the current time. It uses
@@ -12,7 +34,7 @@ package checker
 //   - bool: A boolean value indicating whether the provided time is before
 //     the current time.
 //
-// Panics:
+// Panic:
 //
 //	This function will panic if the provided value cannot be converted to a time.Time
 //	object through the toTime() function.
@@ -217,7 +239,7 @@ func IsAfter(a, b any) bool {
 //   - bool: This function returns true if the date represented by input parameter is the
 //     current date. Otherwise, it returns false.
 //
-// Panics:
+// Panic:
 //
 //	This function will panic if it's unable to convert the provided value into a time.Time format.
 //

@@ -1,3 +1,25 @@
+//	MIT License
+//
+//	Copyright (c) 2024 Gabriel Henrique Cataldo Moskorz
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a copy
+//	of this software and associated documentation files (the "Software"), to deal
+//	in the Software without restriction, including without limitation the rights
+//	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//	copies of the Software, and to permit persons to whom the Software is
+//	furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in all
+//	copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//	SOFTWARE.
+
 package checker
 
 import (
@@ -89,27 +111,40 @@ func AllNil(a, b any, c ...any) bool {
 	return true
 }
 
-// AllNonNil determines whether multiple values are all non-nil by calling the AllNil function and negating its result.
-//
-// This function takes at least two interface parameters `a` and `b`, and optionally additional values `c ...any` to be checked for nil.
-// It calls the AllNil function with the parameters `a`, `b`, and `c` and returns the negation of the result.
+// AllNonNil determines whether all given values are not nil. It uses the IsNil function
+// to check if each value is nil and returns false if any value is nil.
 //
 // Parameters:
-//   - a: Any interface value to be checked for nil.
-//   - b: Second interface value to be checked for nil.
-//   - c: Variadic parameter for additional values to be checked for nil.
+//   - a: The first value to be checked for nil.
+//   - b: The second value to be checked for nil.
+//   - c: A variadic slice containing other values to be checked for nil.
 //
 // Returns:
-//   - bool: A boolean value indicating whether all the values are non-nil.
+//   - bool: A boolean value indicating whether all values are not nil.
 //
 // Example:
 //
-//	AllNonNil(nil)                  // false
-//	AllNonNil(nil, nil)             // false
-//	AllNonNil(nil, "hello", 42)     // false
-//	AllNonNil("hello", 42)          // true
+//		var x *int
+//		y := 10
+//		z := "Hello"
+//		fmt.Println(AllNonNil(x, y)) // false
+//		fmt.Println(AllNonNil(y, z)) // true
+//
+//	 AllNonNil can also be used with a varying number of values:
+//
+//		var i *int
+//		j := "Go"
+//		k := 15
+//		fmt.Println(AllNonNil(j, k, "example", 20)) // true
+//		fmt.Println(AllNonNil(i, j, k)) // false
 func AllNonNil(a, b any, c ...any) bool {
-	return !AllNil(a, b, c...)
+	c = append([]any{a, b}, c...)
+	for _, i := range c {
+		if IsNil(i) {
+			return false
+		}
+	}
+	return true
 }
 
 // IsEmpty checks if a given value is empty based on its type.
@@ -225,32 +260,45 @@ func AllEmpty(a, b any, c ...any) bool {
 	return true
 }
 
-// AllNotEmpty checks if all given values are not empty. The values are not empty if they are not nil and,
-// in the case of strings and slices, their length is not zero.
+// AllNotEmpty determines whether all given values are not empty using the IsEmpty function.
+//
+// This function first calls the IsEmpty function on each given value to check if any value is empty.
+// If any value is empty, it immediately returns false.
+// If all values are not empty, the function returns true.
+// The function takes any number of arguments of any types as it variadically accepts argument of type `any`.
 //
 // Parameters:
-//   - a: The first value to be checked for not being empty.
-//   - b: The second value to be checked for not being empty.
-//   - c: A variadic parameter that represents a list of additional values to be checked for not being empty.
+//   - a: The first value to be checked if it is not empty.
+//   - b: The second value to be checked if it is not empty.
+//   - c: The rest of the values to be checked if they are not empty.
 //
 // Returns:
-//   - bool: A boolean value indicating whether all passed values are not empty. It returns true when all provided
-//     values are not empty, false otherwise.
+//   - bool: A boolean value indicating whether all given values are not empty.
 //
 // Example:
 //
-//	strA, strB := "Hello, World!", ""
-//	intC := []int{1, 2, 3}
-//	n := nil
-//	fmt.Println(AllNotEmpty(strA, strB, intC, n)) // false (because strB and n are empty)
+//	strA := "Hello"
+//	strB := "Go"
+//	fmt.Println(AllNotEmpty(strA, strB)) // true
 //
-//	strX, strY := "Hello, World!", "Programming is fun!"
-//	intZ := []int{1, 2, 3}
-//	m := make(map[string]int)
-//	m["Gophers"] = 6
-//	fmt.Println(AllNotEmpty(strX, strY, intZ, m)) // true (because all values are not empty)
+//	strC := "    "
+//	fmt.Println(AllNotEmpty(strA, strC)) // false
+//
+//	list1 := []int{1, 2, 3}
+//	list2 := []int{}
+//	fmt.Println(AllNotEmpty(list1, list2)) // false
+//
+//	m1 := make(map[string]int{"key": 1})
+//	m2 := make(map[string]int)
+//	fmt.Println(AllNotEmpty(m1, m2))  // false
 func AllNotEmpty(a, b any, c ...any) bool {
-	return !AllEmpty(a, b, c...)
+	c = append([]any{a, b}, c...)
+	for _, i := range c {
+		if IsEmpty(i) {
+			return false
+		}
+	}
+	return true
 }
 
 // IsNilOrEmpty checks whether a given value is nil or empty.
@@ -341,28 +389,41 @@ func AllNilOrEmpty(a, b any, c ...any) bool {
 	return true
 }
 
-// AllNotNilOrEmpty verifies whether all supplied values are not nil or empty.
-// The function accepts an initial pair of values and an optional series of additional values.
-// These supplementary arguments are processed using the IsNotNilOrEmpty function. If all
-// the values are neither nil nor empty, the function returns true.
+// AllNotNilOrEmpty checks whether all the given values are neither nil nor empty.
 //
 // Parameters:
-//   - a: The first value to check for not being nil or empty.
-//   - b: The second value to check for not being nil or empty.
-//   - c: Optional additional values to check for not being nil or empty.
+//   - a: The first interface value to be checked for nil or empty.
+//   - b: The second interface value to be checked for nil or empty.
+//   - c: Additional interfaces (variadic) to be checked for nil or empty.
+//
+// The function appends all parameters into a single slice and then iterates over this slice, for each value checking
+// if it is nil or empty by invoking the IsNilOrEmpty() function.
 //
 // Returns:
-//   - bool: A boolean value indicating whether all the values are neither nil nor empty.
+//   - bool: A boolean value indicating whether all values are neither nil nor empty.
+//     If IsNilOrEmpty() ever returns true for any value, AllNotNilOrEmpty() immediately returns false.
+//     If IsNilOrEmpty() returns false for all values, AllNotNilOrEmpty() will return true, indicating that no values
+//     were nil or empty.
 //
 // Example:
 //
-//	var str string
 //	x := 10
-//	var m map[string]int
+//	y := "NotEmpty"
+//	z := []int{1, 2, 3}
+//	w := map[string]int{"one": 1}
+//	fmt.Println(AllNotNilOrEmpty(x, y, z, w)) // true
 //
-//	fmt.Println(AllNotNilOrEmpty(str, "NotEmpty")) // false
-//	fmt.Println(AllNotNilOrEmpty(x, 20)) // true
-//	fmt.Println(AllNotNilOrEmpty(m, x, "NotEmpty")) // false
+//	x := (*int)(nil)
+//	y := ""
+//	z := []int{}
+//	w := map[string]int{}
+//	fmt.Println(AllNotNilOrEmpty(x, y, z, w)) // false
 func AllNotNilOrEmpty(a, b any, c ...any) bool {
-	return !AllNilOrEmpty(a, b, c...)
+	c = append([]any{a, b}, c...)
+	for _, v := range c {
+		if IsNilOrEmpty(v) {
+			return false
+		}
+	}
+	return true
 }

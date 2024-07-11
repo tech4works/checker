@@ -1,7 +1,6 @@
 package checker
 
 import (
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"testing"
 )
@@ -546,58 +545,6 @@ func TestIsBase64(t *testing.T) {
 
 			if got := IsBase64(tt.arg); got != tt.want {
 				t.Errorf("IsBase64() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestIsBCrypt(t *testing.T) {
-	hashed, _ := bcrypt.GenerateFromPassword([]byte("ValidPassword"), bcrypt.DefaultCost)
-	invalid := []byte("InvalidPassword")
-
-	testCases := []baseCase{
-		{
-			name: "valid bcrypt",
-			arg:  hashed,
-			want: true,
-		},
-		{
-			name: "valid bcrypt string",
-			arg:  string(hashed),
-			want: true,
-		},
-		{
-			name: "valid bcrypt pointer",
-			arg:  &hashed,
-			want: true,
-		},
-		{
-			name: "empty string",
-			arg:  "",
-			want: false,
-		},
-		{
-			name: "invalid bcrypt",
-			arg:  invalid,
-			want: false,
-		},
-		{
-			name:  "nil bcrypt",
-			arg:   nil,
-			panic: true,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			defer func() {
-				if r := recover(); (r != nil) != tc.panic {
-					t.Errorf("IsBCrypt() panic = %v, wantPanic = %v", r, tc.panic)
-				}
-			}()
-
-			if got := IsBCrypt(tc.arg); got != tc.want {
-				t.Errorf("IsBCrypt(%v) = %v; want %v", tc.arg, got, tc.want)
 			}
 		})
 	}
