@@ -6,6 +6,7 @@ import (
 )
 
 func TestIsURL(t *testing.T) {
+	url := "https://example.com"
 	testCases := []baseCase{
 		{
 			name: "ValidHTTPURL",
@@ -20,6 +21,11 @@ func TestIsURL(t *testing.T) {
 		{
 			name: "ValidURLWithPort",
 			arg:  "http://localhost:8080",
+			want: true,
+		},
+		{
+			name: "ValidURLPointer",
+			arg:  &url,
 			want: true,
 		},
 		{
@@ -236,7 +242,7 @@ func TestIsAlphaSpace(t *testing.T) {
 		{
 			name: "OnlySpaces",
 			arg:  "    ",
-			want: true,
+			want: false,
 		},
 		{
 			name: "NumbersOnly",
@@ -267,7 +273,7 @@ func TestIsNumeric(t *testing.T) {
 		{name: "positive float", arg: 123.456, want: true},
 		{name: "zero", arg: 0, want: true},
 		{name: "uint", arg: uint(23), want: true},
-		{name: "complex", arg: complex(23.2, 231), want: true},
+		{name: "complex", arg: complex(23.2, 231), want: false},
 		{name: "pointer nil", arg: p, panic: true},
 		{name: "nil", panic: true},
 	}
@@ -299,7 +305,7 @@ func TestIsNumericSpace(t *testing.T) {
 		{
 			name: "onlySpaces",
 			arg:  "        ",
-			want: true,
+			want: false,
 		},
 		{
 			name: "mixedDigitsAndSpaces",
@@ -360,6 +366,51 @@ func TestIsEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsEmail(tt.arg); got != tt.want {
 				t.Errorf("IsEmail() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsDocument(t *testing.T) {
+	tests := []struct {
+		name         string
+		documentType Document
+		a            any
+		want         bool
+		panic        bool
+	}{
+		{
+			name:         "Test_for_Document_Type_CPF",
+			documentType: DocumentCPF,
+			a:            "37769361001",
+			want:         true,
+		},
+		{
+			name:         "Test_for_Document_Type_CNPJ",
+			documentType: DocumentCNPJ,
+			a:            "53.618.253/0001-90",
+			want:         true,
+		},
+		{
+			name:         "Test_for_Document_Type_Not_Valid",
+			documentType: Document("Not Valid"),
+			a:            "123456",
+			panic:        true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.panic {
+				defer func() {
+					if r := recover(); r == nil {
+						t.Errorf("The code did not panic")
+					}
+				}()
+			}
+
+			if got := IsDocument(tt.documentType, tt.a); got != tt.want {
+				t.Errorf("IsDocument() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -636,7 +687,7 @@ func TestIsFullName(t *testing.T) {
 		{name: "Empty Full Name", arg: "", want: false},
 		{name: "Whitespace Full Name", arg: "   ", want: false},
 		{name: "Full Name with underscore", arg: "John_Doe", want: false},
-		{name: "Single word Full Name", arg: "John", want: true},
+		{name: "Single word Full Name", arg: "John", want: false},
 		{name: "Integer Full Name", arg: 123456, want: false},
 		{name: "Non-string Full Name", arg: []int{1, 2, 3}, want: false},
 	}
@@ -650,7 +701,7 @@ func TestIsFullName(t *testing.T) {
 	}
 }
 
-func TestIsIOSDeviceId(t *testing.T) {
+func TestIsIOSDeviceID(t *testing.T) {
 	tests := []baseCase{
 		{
 			name: "Valid IOS device Id",
@@ -681,15 +732,15 @@ func TestIsIOSDeviceId(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := IsIOSDeviceId(tc.arg)
+			got := IsIOSDeviceID(tc.arg)
 			if got != tc.want {
-				t.Fatalf("IsIOSDeviceId() = %v, want %v", got, tc.want)
+				t.Fatalf("IsIOSDeviceID() = %v, want %v", got, tc.want)
 			}
 		})
 	}
 }
 
-func TestIsAndroidDeviceId(t *testing.T) {
+func TestIsAndroidDeviceID(t *testing.T) {
 	tests := []baseCase{
 		{
 			name:  "nil input",
@@ -727,11 +778,11 @@ func TestIsAndroidDeviceId(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
 				if r := recover(); (r != nil) != tt.panic {
-					t.Errorf("IsAndroidDeviceId() panic = %v, wantPanic = %v", r, tt.panic)
+					t.Errorf("IsAndroidDeviceID() panic = %v, wantPanic = %v", r, tt.panic)
 				}
 			}()
 
-			got := IsAndroidDeviceId(tt.arg)
+			got := IsAndroidDeviceID(tt.arg)
 			if got != tt.want {
 				t.Errorf("IsAndroidDeviceId() = %v, want %v", got, tt.want)
 			}
@@ -739,7 +790,7 @@ func TestIsAndroidDeviceId(t *testing.T) {
 	}
 }
 
-func TestIsMobileDeviceId(t *testing.T) {
+func TestIsMobileDeviceID(t *testing.T) {
 	tests := []baseCase{
 		{
 			name: "EmptyString",
@@ -770,8 +821,8 @@ func TestIsMobileDeviceId(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsMobileDeviceId(tt.arg); got != tt.want {
-				t.Errorf("IsMobileDeviceId() = %v, want %v", got, tt.want)
+			if got := IsMobileDeviceID(tt.arg); got != tt.want {
+				t.Errorf("IsMobileDeviceID() = %v, want %v", got, tt.want)
 			}
 		})
 	}

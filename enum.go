@@ -24,6 +24,16 @@ package checker
 
 import "reflect"
 
+// Document represents a custom type for different types of documents.
+type Document string
+
+const (
+	// DocumentCPF represents a constant of type Document that indicates a CPF document.
+	DocumentCPF Document = "CPF"
+	// DocumentCNPJ represents a constant of type Document that indicates a CNPJ document.
+	DocumentCNPJ Document = "CNPJ"
+)
+
 // BaseEnum is an interface that defines a method IsEnumValid.
 //
 // It is used in conjunction with the BaseEnum interface to validate enum values.

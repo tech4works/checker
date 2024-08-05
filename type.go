@@ -52,7 +52,8 @@ func IsJSON(a any) bool {
 	return IsMap(a) || IsSlice(a)
 }
 
-// IsMap determines whether a given value is a map type. It does this by attempting to unmarshal JSON from the given value's bytes representation.
+// IsMap determines whether a given value is a map type.
+// It does this by attempting to unmarshal JSON from the given value's byte representation.
 //
 // Parameters:
 //   - `a`: The value of any type to be checked if it's a map.
@@ -82,7 +83,7 @@ func IsMap(a any) bool {
 //   - a: Any value which should be checked end evaluated if it is a slice.
 //
 // Returns:
-//   - bool: A boolean value indicating whether the input parameter can be unmarshaled into a slice.
+//   - bool: A boolean value indicating whether the input parameter can be unmarshalled into a slice.
 //
 // Panic:
 //   - The function can panic if it encounters any unsupported types during the process or
@@ -289,7 +290,7 @@ func IsByteUnit(a any) bool {
 }
 
 // IsPointerType checks whether the given value's type is a pointer. The
-// function uses the reflect package's ValueOf and Kind functions to accomplish
+// function uses the reflection package's ValueOf and Kind functions to achieve
 // this.
 //
 // Parameters:
@@ -311,14 +312,14 @@ func IsPointerType(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Pointer
 }
 
-// IsFuncType checks whether the given value is a function. It uses the reflect package
-// to inspect the value and verifies if its kind is Func.
+// IsFuncType checks whether the given value is a function.
+// It uses the reflection package to inspect the value and verifies if its kind is Func.
 //
 // Parameters:
 //   - a: An interface{} value for which the functional type check has to be performed.
 //
 // Returns:
-//   - bool: A boolean indicating whether the passed value is of Func type.
+//   - bool: A boolean indicating whether the passed value is of a Func type.
 //
 // Example:
 //
@@ -333,8 +334,8 @@ func IsFuncType(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Func
 }
 
-// IsChanType checks whether the provided value is of channel type. It uses the reflect package
-// to determine the type of the input value and returns true if it's a channel.
+// IsChanType checks whether the provided value is of a channel type.
+// It uses the reflection package to determine the type of the input value and returns true if it's a channel.
 //
 // Parameters:
 //   - a: Any value (of any type) to be checked for being a channel.
@@ -355,8 +356,8 @@ func IsChanType(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Chan
 }
 
-// IsMapType checks whether the provided value is a map. It uses the reflect package
-// to observe the actual type of the given value and compares it with reflect.Map.
+// IsMapType checks whether the provided value is a map.
+// It uses the reflection package to observe the actual type of the given value and compares it with reflection.Map.
 //
 // Parameters:
 //   - a: Any interface value that needs to be checked if it is a map.
@@ -377,11 +378,12 @@ func IsMapType(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Map
 }
 
-// IsStructType determines whether a given value is of a Struct type. It uses the reflect package's Kind method
+// IsStructType determines whether a given value is of a Struct type.
+// It uses the reflection package's Kind method
 // to check if the value's type is a Struct and returns as a boolean result.
 //
 // Parameters:
-//   - a: An interface value of any type to be checked for Struct type.
+//   - a: An interface value of any type to be checked for a Struct type.
 //
 // Returns:
 //   - bool: A boolean value indicating whether the value's type is Struct.
@@ -399,16 +401,18 @@ func IsMapType(a any) bool {
 //	fmt.Println(IsStructType(x)) // false
 //
 // Please note that the function does not handle nil pointers and can panic if a
-// nil pointer is passed in. Always check for nil before passing pointers.
+// nil pointer is passed in.
+// Always check for nil before passing pointers.
 func IsStructType(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Struct
 }
 
-// IsSliceType checks whether a given value is of a slice type. It utilizes the Go reflect package's ValueOf
-// method to infer the type of the value and subsequently checks if it is a slice using the Kind method.
+// IsSliceType checks whether a given value is of a slice type.
+// It uses the Go reflect package's ValueOf method to infer the type of the value and subsequently checks if it is a
+// slice using the Kind method.
 //
 // Parameters:
-//   - a: Any interface value to be checked for slice type.
+//   - a: Any interface value to be checked for a slice type.
 //
 // Returns:
 //   - bool: A boolean indicative of whether the value is of slice type or not.
@@ -426,8 +430,9 @@ func IsSliceType(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Slice
 }
 
-// IsArrayType checks whether a given value is of an array type. It utilizes the Go reflect package's ValueOf
-// function to infer the type of the variable and subsequently checks if it's an array using the Kind function.
+// IsArrayType checks whether a given value is of an array type.
+// It uses the Go reflect package's ValueOf function to infer the type of the variable and subsequently checks if it's
+// an array using the Kind function.
 //
 // Parameters:
 //   - a: This is any interface value that is to be checked for an array type.
@@ -473,8 +478,8 @@ func IsSliceOrArrayType(a any) bool {
 	return IsSliceType(a) || IsArrayType(a)
 }
 
-// IsStringType determines whether a given value is of type string. It uses the reflect package
-// to check the kind of the value and compares it with reflect.String.
+// IsStringType determines whether a given value is of type string.
+// It uses the reflection package to check the kind of the value and compares it with reflect.String.
 //
 // Parameters:
 //   - a: Any interface value to be checked for type string.
@@ -496,7 +501,7 @@ func IsStringType(a any) bool {
 }
 
 // IsIntType checks whether the provided interface value is an integer type.
-// It uses the reflect package to inspect the type of the value at runtime
+// It uses the reflection package to inspect the type of the value at runtime
 // and compares this with the reflect.Int type.
 //
 // Parameters:
@@ -518,14 +523,15 @@ func IsIntType(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Int
 }
 
-// IsInt8Type checks whether a given value is of Int8 type. It uses the reflect package's ValueOf and Kind functions
+// IsInt8Type checks whether a given value is of an Int8 type.
+// It uses the reflect package's ValueOf and Kind functions
 // to determine the type of the value.
 //
 // Parameters:
 //   - a: Any interface value whose type is to be checked.
 //
 // Returns:
-//   - bool: A boolean value indicating whether the value is of Int8 type.
+//   - bool: A boolean value indicating whether the value is of an Int8 type.
 //
 // Example:
 //
@@ -541,7 +547,7 @@ func IsInt8Type(a any) bool {
 }
 
 // IsInt16Type checks if the given value is of type int16. It uses the reflect package's ValueOf method
-// to create a reflect.Value of the "a" argument and the Kind method to obtain its exact kind.
+// to create a reflect.Value of the "a" argument and the Kind method to get its exact kind.
 // It then checks if the kind is identical to reflect.Int16.
 //
 // Parameters:
@@ -608,8 +614,8 @@ func IsInt64Type(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Int64
 }
 
-// IsUintType determines whether a given value is of unsigned integer type. It uses the Kind method
-// from reflect package to check the type of the value and compares it with reflect.Uint.
+// IsUintType determines whether a given value is of the unsigned integer type.
+// It uses the Kind method from reflect package to check the type of the value and compares it with reflect.Uint.
 //
 // Parameters:
 //   - a: Any interface value to be checked for the unsigned integer type.
@@ -675,14 +681,15 @@ func IsUint16Type(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Uint16
 }
 
-// IsUint32Type checks if a given value is of uint32 type. It uses the reflect package
+// IsUint32Type checks if a given value is of an uint32 type.
+// It uses the reflect package
 // to check for the kind of the given value and returns a boolean indicating if it is uint32 or not.
 //
 // Parameters:
 //   - a: The interface value to be checked for the uint32 type.
 //
 // Returns:
-//   - bool: A boolean value indicating whether the provided value is of uint32 type.
+//   - bool: A boolean value indicating whether the provided value is of an uint32 type.
 //
 // Example:
 //
@@ -763,15 +770,15 @@ func IsFloat64Type(a any) bool {
 	return reflect.ValueOf(a).Kind() == reflect.Float64
 }
 
-// IsBoolType determines whether a given value is of bool type. It uses the Kind
-// method of reflect Value to check the kind of the given value and compares it
+// IsBoolType determines whether a given value is of a bool type.
+// It uses the Kind method of reflect Value to check the kind of the given value and compares it
 // against reflect.Bool.
 //
 // Parameters:
-//   - a: Any interface value to be checked for bool type.
+//   - a: Any interface value to be checked for a bool type.
 //
 // Returns:
-//   - bool: A Boolean value indicating whether the given value is of bool type.
+//   - bool: A Boolean value indicating whether the given value is of a bool type.
 //
 // Example:
 //
@@ -787,7 +794,7 @@ func IsBoolType(a any) bool {
 }
 
 // IsTimeType determines whether a given value is of time.Time type. It uses the reflect.TypeOf function
-// to check the type of the value and compares it with type of time.Time.
+// to check the type of the value and compares it with a type of time.Time.
 //
 // Parameters:
 //   - a: Any interface value to be checked for time.Time type.
@@ -853,16 +860,16 @@ func IsBytesType(a any) bool {
 	return reflect.TypeOf(a) == reflect.TypeOf([]byte{})
 }
 
-// IsErrorType checks whether the given value is of error type. It does this
-// by performing a type assertion of the value as error and returns the result
+// IsErrorType checks whether the given value is of an error type.
+// It does this by performing a type assertion of the value as error and returns the result
 // of this operation. If the value is of error type, the function will return true,
 // if not - false.
 //
 // Parameters:
-//   - a: Any interface value to be checked for being of error type.
+//   - a: Any interface value to be checked for being of an error type.
 //
 // Returns:
-//   - bool: A boolean value indicating whether the value is of error type.
+//   - bool: A boolean value indicating whether the value is of an error type.
 //
 // Example:
 //

@@ -93,18 +93,18 @@ func main() {
 	fmt.Println(checker.IsFullName("John Doe")) // Should return true
 	fmt.Println(checker.IsFullName("John123"))  // Should return false
 
-	fmt.Println("IsIOSDeviceId results:")
-	fmt.Println(checker.IsIOSDeviceId("A1B2C3D4-E5F6-G7H8-I9J0-K1L2M3N4O5P6")) // Should return true
-	fmt.Println(checker.IsIOSDeviceId("asiajsiaaslaks2312oksa"))               // Should return false
+	fmt.Println("IsIOSDeviceID results:")
+	fmt.Println(checker.IsIOSDeviceID("A1B2C3D4-E5F6-G7H8-I9J0-K1L2M3N4O5P6")) // Should return true
+	fmt.Println(checker.IsIOSDeviceID("asiajsiaaslaks2312oksa"))               // Should return false
 
 	fmt.Println("IsAndroidDeviceId results:")
-	fmt.Println(checker.IsAndroidDeviceId("abcdef123456"))     // Should return true
-	fmt.Println(checker.IsAndroidDeviceId("incorrect-format")) // Should return false
+	fmt.Println(checker.IsAndroidDeviceID("abcdef123456"))     // Should return true
+	fmt.Println(checker.IsAndroidDeviceID("incorrect-format")) // Should return false
 
-	fmt.Println("IsMobileDeviceId results:")
-	fmt.Println(checker.IsMobileDeviceId("abcdef123456"))                         // Should return true
-	fmt.Println(checker.IsMobileDeviceId("A1B2C3D4-E5F6-G7H8-I9J0-K1L2M3N4O5P6")) // Should return true
-	fmt.Println(checker.IsMobileDeviceId("incorrect-format"))                     // Should return false
+	fmt.Println("IsMobileDeviceID results:")
+	fmt.Println(checker.IsMobileDeviceID("abcdef123456"))                         // Should return true
+	fmt.Println(checker.IsMobileDeviceID("A1B2C3D4-E5F6-G7H8-I9J0-K1L2M3N4O5P6")) // Should return true
+	fmt.Println(checker.IsMobileDeviceID("incorrect-format"))                     // Should return false
 
 	fmt.Println("IsMobilePlatform results:")
 	fmt.Println(checker.IsMobilePlatform("ANDROID"))          // Should return true
@@ -114,5 +114,5 @@ func main() {
 	fmt.Println(checker.IsMobilePlatform("ios"))              // Should return true
 	fmt.Println(checker.IsMobilePlatform("iphone os"))        // Should return true
 	fmt.Println(checker.IsMobilePlatform("iphone"))           // Should return false
-	fmt.Println(checker.IsMobileDeviceId("incorrect-format")) // Should return false
+	fmt.Println(checker.IsMobileDeviceID("incorrect-format")) // Should return false
 }

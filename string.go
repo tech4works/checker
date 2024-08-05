@@ -23,6 +23,7 @@
 package checker
 
 import (
+	"encoding/base64"
 	"net"
 	"net/http"
 	"net/url"
@@ -60,7 +61,7 @@ func IsURL(a any) bool {
 // regular expression to determine if the string is in URL path format.
 //
 // Parameters:
-//   - a: Any value which will be checked if it's a URL path.
+//   - a: Any value that will be checked if it's a URL path.
 //
 // Returns:
 //   - bool: A boolean value indicating whether the value is a URL path.
@@ -141,8 +142,9 @@ func IsHTTPMethod(a any) bool {
 //	fmt.Println(IsAlpha([]int{1, 2, 3})) // panic
 //	fmt.Println(IsAlpha(nil)) // panic
 func IsAlpha(a any) bool {
+	s := toString(a)
 	regex := regexp.MustCompile("^\\p{L}+$")
-	return regex.MatchString(toString(a))
+	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
 // IsAlphaSpace checks the given value, converts it to string and determines whether it
@@ -168,8 +170,9 @@ func IsAlpha(a any) bool {
 //	fmt.Println(IsAlphaSpace([]int{1, 2, 3})) // panic
 //	fmt.Println(IsAlphaSpace(nil)) // panic
 func IsAlphaSpace(a any) bool {
+	s := toString(a)
 	regex := regexp.MustCompile("^[\\p{L} ]+$")
-	return regex.MatchString(toString(a))
+	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
 // IsNumeric checks the given value, converts it to a string, and determines whether it
@@ -196,8 +199,9 @@ func IsAlphaSpace(a any) bool {
 //	fmt.Println(IsNumeric([]int{1, 2, 3})) // panic
 //	fmt.Println(IsNumeric(nil)) // panic
 func IsNumeric(a any) bool {
-	regex := regexp.MustCompile("^[-.0-9]+$")
-	return regex.MatchString(toString(a))
+	s := toString(a)
+	regex := regexp.MustCompile("^[-.+0-9]+$")
+	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
 // IsNumericSpace determines whether a given value is a numeric string or a string containing spaces only.
@@ -219,8 +223,9 @@ func IsNumeric(a any) bool {
 //	fmt.Println(IsNumericSpace(b)) // true
 //	fmt.Println(IsNumericSpace(c)) // false
 func IsNumericSpace(a any) bool {
+	s := toString(a)
 	regex := regexp.MustCompile("^[0-9 ]+$")
-	return regex.MatchString(toString(a))
+	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
 // IsEmail determines whether a given value is a valid email. It uses the toString function
@@ -247,6 +252,47 @@ func IsNumericSpace(a any) bool {
 func IsEmail(a any) bool {
 	regex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 	return regex.MatchString(toString(a))
+}
+
+// IsDocument determines the type of document (CPF or CNPJ) and checks the value based on the document type.
+// It uses the Document custom type to determine the document type, then uses the IsCPF or the IsCNPJ function
+// to check if the value is valid for the specified document type.
+// Only two document types are allowed: CPF and CNPJ.
+//
+// Parameters:
+//   - documentType: A Document custom type to specify the type of the document.
+//     Can be either DocumentCPF for CPF-type documents or DocumentCNPJ for CNPJ-type documents.
+//   - a: Any interface value to be checked for validity based on the document type.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the value is valid for the specified document type.
+//
+// Panic:
+//   - The function will panic if an unsupported Document type is passed.
+//     Only DocumentCPF and DocumentCNPJ types are supported.
+//     The error message will indicate the unsupported type.
+//
+// Example:
+//
+//	var docTypeCPF Document = DocumentCPF
+//	var docTypeCNPJ Document = DocumentCNPJ
+//	w := "12345678909"
+//	x := "12345678901234"
+//	z := "Not a Document"
+//	fmt.Println(IsDocument(docTypeCPF, w)) // true
+//	fmt.Println(IsDocument(docTypeCNPJ, x)) // true
+//	fmt.Println(IsDocument(docTypeCPF, z)) // false
+//	fmt.Println(IsDocument(docTypeCNPJ, z)) // false
+//	fmt.Println(Document(0),w) // panic: unknown document type: CNH
+func IsDocument(d Document, a any) bool {
+	switch d {
+	case DocumentCPF:
+		return IsCPF(a)
+	case DocumentCNPJ:
+		return IsCNPJ(a)
+	default:
+		panic("unknown document type: " + d)
+	}
 }
 
 // IsCPF checks the given value, converts it to string and determines whether it
@@ -368,18 +414,22 @@ func IsCPFOrCNPJ(a any) bool {
 //	fmt.Println(IsBase64(invalidBase64)) // false
 func IsBase64(a any) bool {
 	s := toString(a)
-	regex := regexp.MustCompile(`^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$`)
-	return IsNotEmpty(s) && regex.MatchString(s)
+	if IsEmpty(s) {
+		return false
+	}
+
+	_, err := base64.StdEncoding.DecodeString(s)
+	return err == nil
 }
 
 // IsBearer checks whether a given value carries a Bearer authentication scheme.
-// It utilizes the toString function to convert the given value to a string.
-// It then uses the Split method from the strings package to divide the
+// It uses the toString function to convert the given value to a string.
+// It then uses the Split method from the string package to divide the
 // string in relation to "Bearer ", and finally checks if the result satisfies
 // the Bearer authentication scheme criteria.
 //
 // Parameters:
-//   - a: Any interface value to be processed and checked for Bearer authentication scheme.
+//   - a: Any interface value to be processed and checked for a Bearer authentication scheme.
 //
 // Returns:
 //   - bool: A boolean value indicating whether the value adheres to the Bearer authentication scheme.
@@ -403,7 +453,7 @@ func IsBearer(a any) bool {
 
 // IsPrivateIP determines whether the provided IP address is a private IP address.
 // The function considers both IPv4 and IPv6 ranges for the check.
-// It uses net.ParseCIDR to obtain the IP blocks of reserved private and local IPs.
+// It uses net.ParseCIDR to get the IP blocks of reserved private and local IPs.
 // The argument is then parsed into an IP using the net.ParseIP function.
 // The parsed IP object is examined for being loop back, link-local uni-cast, or link-local multicast.
 // If it is not, the function checks whether the IP is within any of the defined private IP blocks.
@@ -484,11 +534,12 @@ func IsPrivateIP(a any) bool {
 //	fmt.Println(IsFullName(invalidName)) // false
 func IsFullName(a any) bool {
 	s := toString(a)
+	split := strings.Fields(s)
 	regex := regexp.MustCompile(`^[\p{L}\s'-]+$`)
-	return IsNotEmpty(s) && regex.MatchString(s)
+	return len(split) > 1 && IsNotEmpty(s) && regex.MatchString(s)
 }
 
-// IsIOSDeviceId determines whether a given value adheres to the standard UUID format typically used in iOS device IDs.
+// IsIOSDeviceID determines whether a given value adheres to the standard UUID format typically used in iOS device IDs.
 // It converts the input to a string and then uses a regular expression to check if it matches the pattern.
 //
 // Parameters:
@@ -506,15 +557,15 @@ func IsFullName(a any) bool {
 //
 //	id1 := "A1B2C3D4-E5F6-G7H8-I9J0-K1L2M3N4O5P6"
 //	id2 := "incorrect-format"
-//	fmt.Println(IsIOSDeviceId(id1)) // true
-//	fmt.Println(IsIOSDeviceId(id2)) // false
-func IsIOSDeviceId(a any) bool {
+//	fmt.Println(IsIOSDeviceID(id1)) // true
+//	fmt.Println(IsIOSDeviceID(id2)) // false
+func IsIOSDeviceID(a any) bool {
 	s := toString(a)
 	regex := regexp.MustCompile(`^[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}$`)
 	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
-// IsAndroidDeviceId determines whether a given value adheres to the standard format typically used in Android device IDs.
+// IsAndroidDeviceID determines whether a given value adheres to the standard format typically used in Android device IDs.
 // It converts the input to a string and then uses a regular expression to check if it matches the hexadecimal pattern.
 //
 // Parameters:
@@ -534,14 +585,14 @@ func IsIOSDeviceId(a any) bool {
 //	id2 := "incorrect-format"
 //	fmt.Println(IsAndroidDeviceId(id1)) // true
 //	fmt.Println(IsAndroidDeviceId(id2)) // false
-func IsAndroidDeviceId(a any) bool {
+func IsAndroidDeviceID(a any) bool {
 	s := toString(a)
-	regex := regexp.MustCompile(`^[a-fA-F0-9]{16}$`)
+	regex := regexp.MustCompile(`^[a-fA-F0-9]{16,}$`)
 	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
-// IsMobileDeviceId determines whether a given value is a valid Mobile Device ID.
-// It uses the IsIOSDeviceId and IsAndroidDeviceId functions
+// IsMobileDeviceID determines whether a given value is a valid Mobile Device ID.
+// It uses the IsIOSDeviceID and IsAndroidDeviceId functions
 // to check if the value is a valid iOS or Android device ID.
 //
 // Parameters:
@@ -560,11 +611,11 @@ func IsAndroidDeviceId(a any) bool {
 //	id1 := "A1B2C3D4-E5F6-G7H8-I9J0-K1L2M3N4O5P6"
 //	id2 := "abcdef123456"
 //	id3 := "incorrect-format"
-//	fmt.Println(IsMobileDeviceId(id1)) // true
-//	fmt.Println(IsMobileDeviceId(id2)) // true
-//	fmt.Println(IsMobileDeviceId(id3)) // false
-func IsMobileDeviceId(a any) bool {
-	return IsIOSDeviceId(a) || IsAndroidDeviceId(a)
+//	fmt.Println(IsMobileDeviceID(id1)) // true
+//	fmt.Println(IsMobileDeviceID(id2)) // true
+//	fmt.Println(IsMobileDeviceID(id3)) // false
+func IsMobileDeviceID(a any) bool {
+	return IsIOSDeviceID(a) || IsAndroidDeviceID(a)
 }
 
 // IsMobilePlatform checks the given value, converts it to lowercase string,
