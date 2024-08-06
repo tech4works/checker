@@ -64,6 +64,54 @@ func TestIsJSON(t *testing.T) {
 	}
 }
 
+func TestIsNotJSON(t *testing.T) {
+	tt := []struct {
+		name     string
+		input    interface{}
+		expected bool
+	}{
+		{
+			name:     "EmptyStringShouldNotBeJSON",
+			input:    "",
+			expected: true,
+		},
+		{
+			name:     "JSONStringShouldNotReturnNotJSON",
+			input:    `{"test":"value"}`,
+			expected: false,
+		},
+		{
+			name:     "JSONArrayShouldNotReturnNotJSON",
+			input:    `[1,2,3,4,5]`,
+			expected: false,
+		},
+		{
+			name:     "RegularStringIsNotJSON",
+			input:    "This is not JSON",
+			expected: true,
+		},
+		{
+			name:     "NullValueInJSONIsNotJSON",
+			input:    `{"key": null}`,
+			expected: false,
+		},
+		{
+			name:     "InvalidJSONIsNotJSON",
+			input:    `{"key" "value"}`,
+			expected: true,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			result := IsNotJSON(tc.input)
+			if result != tc.expected {
+				t.Fatalf("expected %v, but got %v", tc.expected, result)
+			}
+		})
+	}
+}
+
 func TestIsMap(t *testing.T) {
 	testCases := []baseCase{
 		{

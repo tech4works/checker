@@ -52,6 +52,28 @@ func IsJSON(a any) bool {
 	return IsMap(a) || IsSlice(a)
 }
 
+// IsNotJSON checks if the given value cannot be a JSON format, either a map or a slice.
+// It uses the IsJSON function to check if the value can be a JSON, and returns the negation of its result.
+//
+// Parameters:
+//   - a: Any interface value to be checked for JSON compatibility.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the value cannot be parsed to JSON.
+//
+// Example:
+//
+//	jsonMap := `{"key": "value"}`
+//	jsonArray := `[1, 2, 3]`
+//	notJson := `Not a JSON string`
+//
+//	fmt.Println(IsNotJSON(jsonMap)) // Outputs: false
+//	fmt.Println(IsNotJSON(jsonArray)) // Outputs: false
+//	fmt.Println(IsNotJSON(notJson)) // Outputs: true
+func IsNotJSON(a any) bool {
+	return !IsJSON(a)
+}
+
 // IsMap determines whether a given value is a map type.
 // It does this by attempting to unmarshal JSON from the given value's byte representation.
 //

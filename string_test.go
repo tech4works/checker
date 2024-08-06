@@ -295,6 +295,58 @@ func TestIsNumeric(t *testing.T) {
 	}
 }
 
+func TestIsNotNumeric(t *testing.T) {
+	tests := []struct {
+		name string
+		arg  any
+		want bool
+	}{
+		{
+			name: "NumericInput",
+			arg:  123,
+			want: false,
+		},
+		{
+			name: "StringNumericInput",
+			arg:  "123",
+			want: false,
+		},
+		{
+			name: "FloatInput",
+			arg:  12.3,
+			want: false,
+		},
+		{
+			name: "StringText",
+			arg:  "This is not numeric",
+			want: true,
+		},
+		{
+			name: "EmptyString",
+			arg:  "",
+			want: true,
+		},
+		{
+			name: "BooleanInput",
+			arg:  true,
+			want: true,
+		},
+		{
+			name: "SpecialCharacterInput",
+			arg:  "@!#%",
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsNotNumeric(tt.arg); got != tt.want {
+				t.Errorf("IsNotNumeric() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestIsNumericSpace(t *testing.T) {
 	tests := []baseCase{
 		{

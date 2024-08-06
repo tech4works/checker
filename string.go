@@ -204,6 +204,31 @@ func IsNumeric(a any) bool {
 	return IsNotEmpty(s) && regex.MatchString(s)
 }
 
+// IsNotNumeric checks whether a given value consists of non-numeric characters.
+// It inverts the result from the IsNumeric function to provide this boolean value.
+//
+// Parameters:
+//   - a: Any value to be checked if it consists of only non-numeric characters.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the given value consists of only non-numeric characters.
+//
+// Panic:
+//   - The function will panic if an unsupported value is passed.
+//     If the value is not of a string, numeric, bool, array, slice, map, struct, interface, or pointer type.
+//
+// Example:
+//
+//	s := "Hello World"
+//	fmt.Println(IsNotNumeric(s)) // true
+//	fmt.Println(IsNotNumeric("123")) // false
+//	fmt.Println(IsNotNumeric(123)) // panic
+//	fmt.Println(IsNotNumeric([]int{1, 2, 3})) // panic
+//	fmt.Println(IsNotNumeric(nil)) // panic
+func IsNotNumeric(a any) bool {
+	return !IsNumeric(a)
+}
+
 // IsNumericSpace determines whether a given value is a numeric string or a string containing spaces only.
 // It uses the toString function to convert the input to string and a regular expression to check the converted string.
 //
