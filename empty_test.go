@@ -130,6 +130,66 @@ func TestNoneNilOrEmpty(t *testing.T) {
 	}
 }
 
+func TestIfNilReturns(t *testing.T) {
+	tests := []struct {
+		name     string
+		a        *string
+		b        string
+		expected string
+	}{
+		{
+			name:     "NilValue",
+			a:        nil,
+			b:        "default",
+			expected: "default",
+		},
+		{
+			name: "NonNilValue",
+			a: func() *string {
+				str := "non-default"
+				return &str
+			}(),
+			b:        "default",
+			expected: "non-default",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if result := IfNilReturns(test.a, test.b); result != test.expected {
+				t.Errorf("Expected %v, but got %v", test.expected, result)
+			}
+		})
+	}
+}
+
+func TestIfEmptyReturns(t *testing.T) {
+	type Test struct {
+		a        interface{}
+		b        interface{}
+		expected interface{}
+	}
+
+	tests := []Test{
+		{"", "not empty", "not empty"},
+		{"not empty", "", "not empty"},
+		{"not empty", "not empty", "not empty"},
+		{nil, "not empty", "not empty"},
+		{"not empty", nil, "not empty"},
+		{nil, nil, nil},
+		{123, nil, 123},
+		{nil, 1234, 1234},
+		{1234, 5678, 1234},
+	}
+
+	for _, test := range tests {
+		result := IfEmptyReturns(test.a, test.b)
+		if result != test.expected {
+			t.Errorf("For values '%v' and '%v', expected '%v', but got '%v'", test.a, test.b, test.expected, result)
+		}
+	}
+}
+
 func buildIsNilCases() []emptyCase {
 	return []emptyCase{
 		{name: "IntNil", args: []any{(*int)(nil)}, want: true},

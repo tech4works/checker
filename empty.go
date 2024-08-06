@@ -426,3 +426,62 @@ func NoneNilOrEmpty(a, b any, c ...any) bool {
 	}
 	return true
 }
+
+// IfNilReturns checks if the given value is nil and if so, returns the other
+// specified value. It uses the IsNil function to perform the nil check.
+//
+// Parameters:
+//   - a: The pointer to an arbitrary value that will be checked for nil.
+//   - b: The arbitrary value that will be returned if 'a' is nil.
+//
+// Returns:
+//   - T: The same kind of value as 'a' and 'b'. If 'a' is not nil, the referenced value of 'a' will
+//     be returned. If 'a' is nil, 'b' will be returned instead.
+//
+// Panic:
+//   - This function might panic if 'a' is nil and the dereference operation is performed on it.
+//
+// Example:
+//
+//	var x *int
+//	var y int = 10
+//	fmt.Println(IfNilReturns(x, y)) // 10
+//	x = new(int)
+//	*x = 5
+//	fmt.Println(IfNilReturns(x, y)) // 5
+func IfNilReturns[T any](a *T, b T) T {
+	if IsNil(a) {
+		return b
+	}
+	return *a
+}
+
+// IfEmptyReturns checks if the first parameter 'a' value is empty, and returns the second parameter 'b' if 'a' is empty.
+// The empty check is done using the IsEmpty function. If 'a' is not empty, it simply returns 'a'
+//
+// Parameters:
+//   - a: The primary value to be checked for emptiness.
+//   - b: The value to be returned if 'a' is empty.
+//
+// Returns:
+//   - T: The original value 'a' if it is not empty, or the backup value 'b' if 'a' is empty.
+//
+// Example:
+//
+//	strA := ""
+//	strB := "backup"
+//	fmt.Println(ifEmptyReturns(strA, strB))  // output: "backup"
+//
+//	numA := 0
+//	numB := 10
+//	fmt.Println(ifEmptyReturns(numA, numB))  // output: 10
+//
+//	listA := []int{}
+//	listB := []int{1, 2, 3}
+//	fmt.Println(ifEmptyReturns(listA, listB))  // output: [1 2 3]
+func IfEmptyReturns[T any](a T, b T) T {
+	if IsEmpty(a) {
+		return b
+	}
+	return a
+}
