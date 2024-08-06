@@ -1,6 +1,6 @@
 //	MIT License
 //
-//	Copyright (c) 2024 Gabriel Henrique Cataldo Moskorz
+//	Copyright (c) 2024 Tech4Works
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a copy
 //	of this software and associated documentation files (the "Software"), to deal
