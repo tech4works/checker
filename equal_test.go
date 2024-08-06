@@ -85,6 +85,73 @@ func TestEquals(t *testing.T) {
 	}
 }
 
+func TestNotEquals(t *testing.T) {
+	testCases := []equalsCase{
+		{
+			name: "BasicEqual",
+			a:    1,
+			b:    1,
+			want: false,
+		},
+		{
+			name: "BasicNotEqual",
+			a:    1,
+			b:    2,
+			want: true,
+		},
+		{
+			name: "EmptyString",
+			a:    "",
+			b:    "",
+			want: false,
+		},
+		{
+			name: "DifferentStrings",
+			a:    "hello",
+			b:    "world",
+			want: true,
+		},
+		{
+			name: "Nil",
+			a:    nil,
+			b:    nil,
+			want: false,
+		},
+		{
+			name: "NilAndValue",
+			a:    nil,
+			b:    2,
+			want: true,
+		},
+		{
+			name: "ArrayDifferentLength",
+			a:    []int{1, 2, 3},
+			b:    []int{1, 2, 3, 4},
+			want: true,
+		},
+		{
+			name: "ArraySameElement",
+			a:    []int{1, 2, 3},
+			b:    []int{1, 2, 3},
+			want: false,
+		},
+		{
+			name: "ArrayDifferentElement",
+			a:    []int{1, 2, 3},
+			b:    []int{4, 5, 6},
+			want: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := NotEquals(tc.a, tc.b); got != tc.want {
+				t.Errorf("\nCase : %v\nGot  : %v\nWant : %v", tc.name, got, tc.want)
+			}
+		})
+	}
+}
+
 func TestEqualsIgnoreCase(t *testing.T) {
 	strPointer := "JAVA"
 
@@ -168,6 +235,24 @@ func TestEqualsIgnoreCase(t *testing.T) {
 	}
 }
 
+func TestNotEqualsIgnoreCase(t *testing.T) {
+	tests := []equalsCase{
+		{name: "same case", a: "Test", b: "Test", want: false},
+		{name: "different case", a: "Test", b: "test", want: false},
+		{name: "different strings", a: "Test", b: "Another", want: true},
+		{name: "empty strings", a: "", b: "", want: false},
+		{name: "empty and non-empty", a: "", b: "test", want: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NotEqualsIgnoreCase(tt.a, tt.b); got != tt.want {
+				t.Errorf("NotEqualsIgnoreCase() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestAllEquals(t *testing.T) {
 	tests := []equalsCase{
 		{
@@ -224,6 +309,54 @@ func TestAllEquals(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := AllEquals(tt.a, tt.b, tt.c...); got != tt.want {
 				t.Errorf("AllEquals() = %v, want = %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNoneEquals(t *testing.T) {
+	testCases := []equalsCase{
+		{
+			name: "Different Types",
+			a:    10,
+			b:    "40",
+			c:    []any{20, 30.5},
+			want: true,
+		},
+		{
+			name: "Same Values",
+			a:    10,
+			b:    10,
+			c:    []any{10, 10},
+			want: false,
+		},
+		{
+			name: "Mixed Values",
+			a:    10,
+			b:    20,
+			c:    []any{30, "40"},
+			want: true,
+		},
+		{
+			name: "Repeated Values",
+			a:    "hello",
+			b:    "hello",
+			c:    []any{"hello", 20},
+			want: false,
+		},
+		{
+			name: "Empty Case",
+			a:    "",
+			b:    "",
+			c:    []any{"", ""},
+			want: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := NoneEquals(tc.a, tc.b, tc.c...); got != tc.want {
+				t.Errorf("NoneEquals(%v, %v, %v) = %v; want %v", tc.a, tc.b, tc.c, got, tc.want)
 			}
 		})
 	}

@@ -40,10 +40,10 @@ func TestAllNil(t *testing.T) {
 	}
 }
 
-func TestAllNonNil(t *testing.T) {
-	for _, tt := range buildAllNonNilCases() {
+func TestNoneNil(t *testing.T) {
+	for _, tt := range buildNoneNilCases() {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := AllNonNil(tt.args[0], tt.args[1]); got != tt.want {
+			if got := NoneNil(tt.args[0], tt.args[1]); got != tt.want {
 				t.Errorf("AllNonNil() = %v, want = %v", got, tt.want)
 			}
 		})
@@ -80,10 +80,10 @@ func TestAllEmpty(t *testing.T) {
 	}
 }
 
-func TestAllNotEmpty(t *testing.T) {
-	for _, tc := range buildAllNotEmptyCases() {
+func TestNoneEmpty(t *testing.T) {
+	for _, tc := range buildNoneEmptyCases() {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := AllNotEmpty(tc.args[0], tc.args[1]); got != tc.want {
+			if got := NoneEmpty(tc.args[0], tc.args[1]); got != tc.want {
 				t.Errorf("AllNotEmpty() = %v, want = %v", got, tc.want)
 			}
 		})
@@ -120,10 +120,10 @@ func TestAllNilOrEmpty(t *testing.T) {
 	}
 }
 
-func TestAllNotNilOrEmpty(t *testing.T) {
-	for _, tc := range buildAllNotNilOrEmptyCases() {
+func TestNoneNilOrEmpty(t *testing.T) {
+	for _, tc := range buildNoneNilOrEmptyCases() {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := AllNotNilOrEmpty(tc.args[0], tc.args[1]); got != tc.want {
+			if got := NoneNilOrEmpty(tc.args[0], tc.args[1]); got != tc.want {
 				t.Errorf("AllNotNilOrEmpty() = %v, want = %v", got, tc.want)
 			}
 		})
@@ -190,7 +190,7 @@ func buildAllNilCases() []emptyCase {
 	}
 }
 
-func buildAllNonNilCases() []emptyCase {
+func buildNoneNilCases() []emptyCase {
 	return []emptyCase{
 		{name: "AllNonNil", args: []any{make(chan struct{}), new(float64)}, want: true},
 		{name: "AllNil", args: []any{(*int)(nil), (*float64)(nil), ([]int)(nil), (*struct{})(nil)}, want: false},
@@ -258,7 +258,7 @@ func buildAllEmptyCases() []emptyCase {
 	}
 }
 
-func buildAllNotEmptyCases() []emptyCase {
+func buildNoneEmptyCases() []emptyCase {
 	return []emptyCase{
 		{name: "NonEmptyString", args: []any{"test", "test"}, want: true},
 		{name: "EmptyString", args: []any{"", ""}, want: false},
@@ -358,7 +358,7 @@ func buildAllNilOrEmptyCases() []emptyCase {
 	}
 }
 
-func buildAllNotNilOrEmptyCases() []emptyCase {
+func buildNoneNilOrEmptyCases() []emptyCase {
 	return []emptyCase{
 		{
 			name: "AllNotNullOrNotEmpty",

@@ -126,6 +126,52 @@ func TestContains(t *testing.T) {
 	}
 }
 
+func TestNotContains(t *testing.T) {
+	tests := []containsCase{
+		{
+			name: "NotContainString",
+			a:    "hello world",
+			b:    "bye",
+			want: true,
+		},
+		{
+			name: "NotContainInSlice",
+			a:    []int{1, 2, 3},
+			b:    4,
+			want: true,
+		},
+		{
+			name: "NotContainsInMap",
+			a:    map[string]int{"one": 1, "two": 2, "three": 3},
+			b:    "four",
+			want: true,
+		},
+		{
+			name: "NotContainsInStruct",
+			a: struct {
+				Name string
+				Age  int
+			}{"John Doe", 30},
+			b:    "Jane Doe",
+			want: true,
+		},
+		{
+			name: "ContainsPresent",
+			a:    "hello world",
+			b:    "hello",
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NotContains(tt.a, tt.b); got != tt.want {
+				t.Errorf("NotContains() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestContainsIgnoreCase(t *testing.T) {
 	strA := "Test String"
 	strB := "test"
@@ -222,6 +268,61 @@ func TestContainsIgnoreCase(t *testing.T) {
 	}
 }
 
+func TestNotContainsIgnoreCase(t *testing.T) {
+	testCases := []containsCase{
+		{
+			name: "Both strings lower case",
+			a:    "golang",
+			b:    "python",
+			want: true,
+		},
+		{
+			name: "Both strings upper case",
+			a:    "GOLANG",
+			b:    "PYTHON",
+			want: true,
+		},
+		{
+			name: "Different characters cases in strings - not contains",
+			a:    "GoLang",
+			b:    "PyThon",
+			want: true,
+		},
+		{
+			name: "Empty strings",
+			a:    "",
+			b:    "",
+			want: false,
+		},
+		{
+			name: "Non-empty string with empty string - string a empty",
+			a:    "",
+			b:    "go",
+			want: true,
+		},
+		{
+			name: "Non-empty string with empty string - string b empty",
+			a:    "go",
+			b:    "",
+			want: false,
+		},
+		{
+			name: "Different characters cases in strings - contains",
+			a:    "golang",
+			b:    "LANG",
+			want: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if result := NotContainsIgnoreCase(tc.a, tc.b); result != tc.want {
+				t.Fatalf("Expected '%v', but got '%v'", tc.want, result)
+			}
+		})
+	}
+}
+
 func TestContainsKey(t *testing.T) {
 	strKey := "key_1"
 
@@ -305,6 +406,37 @@ func TestContainsKey(t *testing.T) {
 	}
 }
 
+func TestNotContainsKey(t *testing.T) {
+	testCases := []containsCase{
+		{
+			name: "MapWithExistingKey",
+			a:    map[string]int{"one": 1, "two": 2, "three": 3},
+			b:    "one",
+			want: false,
+		},
+		{
+			name: "MapWithNonExistingKey",
+			a:    map[string]int{"one": 1, "two": 2, "three": 3},
+			b:    "four",
+			want: true,
+		},
+		{
+			name: "EmptyMap",
+			a:    map[string]int{},
+			b:    "one",
+			want: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := NotContainsKey(tc.a, tc.b); got != tc.want {
+				t.Errorf("NotContainsKey(%v, %v) = %v, want %v", tc.a, tc.b, got, tc.want)
+			}
+		})
+	}
+}
+
 func TestContainsOnSlice(t *testing.T) {
 	var tests = []struct {
 		input []int
@@ -324,6 +456,70 @@ func TestContainsOnSlice(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			if got := ContainsOnSlice(tt.input, tt.check); got != tt.want {
 				t.Errorf("ContainsOnSlice() = %v, want = %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNotContainsOnSlice(t *testing.T) {
+	type test struct {
+		name     string
+		slice    []int
+		contains func(int, int) bool
+		want     bool
+	}
+
+	tests := []test{
+		{
+			name:  "empty slice",
+			slice: []int{},
+			contains: func(index int, element int) bool {
+				return element == 3
+			},
+			want: true,
+		},
+
+		{
+			name:  "slice without element",
+			slice: []int{1, 2, 4, 5},
+			contains: func(index int, element int) bool {
+				return element == 3
+			},
+			want: true,
+		},
+
+		{
+			name:  "slice with element",
+			slice: []int{1, 2, 3, 4, 5},
+			contains: func(index int, element int) bool {
+				return element == 3
+			},
+			want: false,
+		},
+
+		{
+			name:  "negative numbers slice without element",
+			slice: []int{-1, -2, -4, -5},
+			contains: func(index int, element int) bool {
+				return element == -3
+			},
+			want: true,
+		},
+
+		{
+			name:  "negative numbers slice with element",
+			slice: []int{-1, -2, -3, -4, -5},
+			contains: func(index int, element int) bool {
+				return element == -3
+			},
+			want: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := NotContainsOnSlice(tc.slice, tc.contains); got != tc.want {
+				t.Errorf("NotContainsOnSlice() = %v, want %v", got, tc.want)
 			}
 		})
 	}

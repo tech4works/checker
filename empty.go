@@ -102,8 +102,7 @@ func NonNil(a any) bool {
 //	fmt.Println(AllNil(nil, nil, nil, nil))// true
 //	fmt.Println(AllNil(nil))               // true
 func AllNil(a, b any, c ...any) bool {
-	c = append([]any{a, b}, c...)
-	for _, i := range c {
+	for _, i := range append([]any{a, b}, c...) {
 		if NonNil(i) {
 			return false
 		}
@@ -111,8 +110,8 @@ func AllNil(a, b any, c ...any) bool {
 	return true
 }
 
-// AllNonNil determines whether all given values are not nil. It uses the IsNil function
-// to check if each value is nil and returns false if any value is nil.
+// NoneNil determines whether all given values are not nil.
+// It uses the IsNil function to check if each value is nil and returns false if any value is nil.
 //
 // Parameters:
 //   - a: The first value to be checked for nil.
@@ -124,20 +123,20 @@ func AllNil(a, b any, c ...any) bool {
 //
 // Example:
 //
-//		var x *int
-//		y := 10
-//		z := "Hello"
-//		fmt.Println(AllNonNil(x, y)) // false
-//		fmt.Println(AllNonNil(y, z)) // true
+//	var x *int
+//	y := 10
+//	z := "Hello"
+//	fmt.Println(NoneNil(x, y)) // false
+//	fmt.Println(NoneNil(y, z)) // true
 //
-//	 AllNonNil can also be used with a varying number of values:
+// NoneNil can also be used with a varying number of values:
 //
-//		var i *int
-//		j := "Go"
-//		k := 15
-//		fmt.Println(AllNonNil(j, k, "example", 20)) // true
-//		fmt.Println(AllNonNil(i, j, k)) // false
-func AllNonNil(a, b any, c ...any) bool {
+//	var i *int
+//	j := "Go"
+//	k := 15
+//	fmt.Println(NoneNil(j, k, "example", 20)) // true
+//	fmt.Println(NoneNil(i, j, k)) // false
+func NoneNil(a, b any, c ...any) bool {
 	c = append([]any{a, b}, c...)
 	for _, i := range c {
 		if IsNil(i) {
@@ -260,7 +259,7 @@ func AllEmpty(a, b any, c ...any) bool {
 	return true
 }
 
-// AllNotEmpty determines whether all given values are not empty using the IsEmpty function.
+// NoneEmpty determines whether all given values are not empty using the IsEmpty function.
 //
 // This function first calls the IsEmpty function on each given value to check if any value is empty.
 // If any value is empty, it immediately returns false.
@@ -279,19 +278,19 @@ func AllEmpty(a, b any, c ...any) bool {
 //
 //	strA := "Hello"
 //	strB := "Go"
-//	fmt.Println(AllNotEmpty(strA, strB)) // true
+//	fmt.Println(NoneEmpty(strA, strB)) // true
 //
 //	strC := "    "
-//	fmt.Println(AllNotEmpty(strA, strC)) // false
+//	fmt.Println(NoneEmpty(strA, strC)) // false
 //
 //	list1 := []int{1, 2, 3}
 //	list2 := []int{}
-//	fmt.Println(AllNotEmpty(list1, list2)) // false
+//	fmt.Println(NoneEmpty(list1, list2)) // false
 //
 //	m1 := make(map[string]int{"key": 1})
 //	m2 := make(map[string]int)
-//	fmt.Println(AllNotEmpty(m1, m2))  // false
-func AllNotEmpty(a, b any, c ...any) bool {
+//	fmt.Println(NoneEmpty(m1, m2))  // false
+func NoneEmpty(a, b any, c ...any) bool {
 	c = append([]any{a, b}, c...)
 	for _, i := range c {
 		if IsEmpty(i) {
@@ -389,7 +388,7 @@ func AllNilOrEmpty(a, b any, c ...any) bool {
 	return true
 }
 
-// AllNotNilOrEmpty checks whether all the given values are neither nil nor empty.
+// NoneNilOrEmpty checks whether all the given values are neither nil nor empty.
 //
 // Parameters:
 //   - a: The first interface value to be checked for nil or empty.
@@ -401,8 +400,8 @@ func AllNilOrEmpty(a, b any, c ...any) bool {
 //
 // Returns:
 //   - bool: A boolean value indicating whether all values are neither nil nor empty.
-//     If IsNilOrEmpty() ever returns true for any value, AllNotNilOrEmpty() immediately returns false.
-//     If IsNilOrEmpty() returns false for all values, AllNotNilOrEmpty() will return true, indicating that no values
+//     If IsNilOrEmpty() ever returns true for any value, NoneNilOrEmpty() immediately returns false.
+//     If IsNilOrEmpty() returns false for all values, NoneNilOrEmpty() will return true, indicating that no values
 //     were nil or empty.
 //
 // Example:
@@ -411,14 +410,14 @@ func AllNilOrEmpty(a, b any, c ...any) bool {
 //	y := "NotEmpty"
 //	z := []int{1, 2, 3}
 //	w := map[string]int{"one": 1}
-//	fmt.Println(AllNotNilOrEmpty(x, y, z, w)) // true
+//	fmt.Println(NoneNilOrEmpty(x, y, z, w)) // true
 //
 //	x := (*int)(nil)
 //	y := ""
 //	z := []int{}
 //	w := map[string]int{}
-//	fmt.Println(AllNotNilOrEmpty(x, y, z, w)) // false
-func AllNotNilOrEmpty(a, b any, c ...any) bool {
+//	fmt.Println(NoneNilOrEmpty(x, y, z, w)) // false
+func NoneNilOrEmpty(a, b any, c ...any) bool {
 	c = append([]any{a, b}, c...)
 	for _, v := range c {
 		if IsNilOrEmpty(v) {

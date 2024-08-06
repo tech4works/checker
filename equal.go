@@ -59,6 +59,39 @@ func Equals(a, b any) bool {
 	return reflect.DeepEqual(a, b)
 }
 
+// NotEquals checks whether two parameters a and b are not profoundly equal.
+// This function uses the Equals function to check if the values are equal and
+// it negates its result. The Equals function uses the DeepEqual function from
+// the reflect package for comparison.
+//
+// Parameters:
+//   - a: First interface value to be compared.
+//   - b: Second interface value to be compared.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the values are not equal.
+//
+// Example usage:
+//
+//	var x = 5
+//	var y = 10
+//	fmt.Println(NotEquals(x, y)) // Outputs: true
+//
+//	var s1 = "hello"
+//	var s2 = "world"
+//	fmt.Println(NotEquals(s1, s2)) // Outputs: true
+//
+//	var arr1 = []int{1, 2, 3}
+//	var arr2 = []int{4, 5, 6}
+//	fmt.Println(NotEquals(arr1, arr2)) // Outputs: true
+//
+// Note: An effort should be made to not to use this function to check the inequality
+// of interface values that represents nil, as the result might be ambiguous without
+// a clear understanding of how underlying Equals function handles nil values.
+func NotEquals(a, b any) bool {
+	return !Equals(a, b)
+}
+
 // EqualsIgnoreCase compares two values and returns true if they are equal, ignoring case.
 //
 // This function takes two parameters, `a` and `b`, of any type. It first validates the input
@@ -89,6 +122,30 @@ func EqualsIgnoreCase(a, b any) bool {
 		strings.ToLower(reflectValueA.String()) == strings.ToLower(reflectValueB.String())
 }
 
+// NotEqualsIgnoreCase determines whether two given values are not equal when a case is ignored.
+// It calls the EqualsIgnoreCase function to compare the values and returns the negation of its result.
+//
+// Parameters:
+//   - a: The first value to be checked for non-equality. It could be of any type.
+//   - b: The second value to be checked for non-equality. It could be of any type.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the two values are not equal ignoring the case.
+//
+// Note: This function might panic when either parameter is nil or when they are not of type string. Please make sure to handle
+// such scenarios in your code.
+//
+// Example:
+//
+//	x := "GoLang"
+//	y := "golang"
+//	z := "Java"
+//	fmt.Println(NotEqualsIgnoreCase(x, y)) // false
+//	fmt.Println(NotEqualsIgnoreCase(x, z)) // true
+func NotEqualsIgnoreCase(a, b any) bool {
+	return !EqualsIgnoreCase(a, b)
+}
+
 // AllEquals checks whether all parameters in the variadic arguments b are
 // profoundly equal to the parameter a. This function internally calls
 // the IsNotEqualTo function for comparison, which returns true if the parameters
@@ -109,9 +166,46 @@ func EqualsIgnoreCase(a, b any) bool {
 // Returns true if all parameters are deeply equal to a, false otherwise.
 func AllEquals(a, b any, c ...any) bool {
 	c = append([]any{a, b}, c...)
-	for _, v1 := range c {
-		for _, v2 := range c {
-			if !Equals(v1, v2) {
+	for i1, v1 := range c {
+		for i2, v2 := range c {
+			if NotEquals(i1, i2) && NotEquals(v1, v2) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// NoneEquals checks whether all given values are profoundly not equal to each other.
+// This function utilizes the Equals function for comparison amongst the values.
+//
+// Parameters:
+//   - a: The first value to be compared.
+//   - b: The second value to be compared.
+//   - c: An optional list of values that will also be included in the comparison.
+//
+// It iterates over every value in the group (a, b and c) and compares each of them with every other.
+// If it finds any two values that are equal, it returns false.
+//
+// Returns:
+//   - bool: A boolean value indicating whether all parameters are profoundly not equal to each other.
+//
+// Example:
+//
+//		x, y, z := "1", 2, 3
+//		v, w := []int{1, 2, 3}, []int{4, 5, 6}
+//		fmt.Println(NoneEquals(x, y, z)) // Outputs: true
+//		fmt.Println(NoneEquals(x, y, z, v, w)) // Outputs: true
+//	    fmt.Println(NoneEquals(x, x)) // Outputs: false
+//
+// Note: This function uses DeepEqual for comparison. DeepEqual considers public and
+// private fields, so two different instances of the same struct type with equal field
+// values are deeply equal, even if their memory addresses differ.
+func NoneEquals(a, b any, c ...any) bool {
+	c = append([]any{a, b}, c...)
+	for i1, v1 := range c {
+		for i2, v2 := range c {
+			if NotEquals(i1, i2) && Equals(v1, v2) {
 				return false
 			}
 		}

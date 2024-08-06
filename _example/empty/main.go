@@ -55,14 +55,14 @@ func main() {
 	fmt.Println(checker.AllNil(nil, 0, "hello", student{}, map[string]any{})) // Should return false.
 
 	fmt.Println("AllNonNil results:")
-	fmt.Println(checker.AllNonNil(3, 22, student{}, "test", 21.23, true, map[string]any{})) // Should return true.
-	fmt.Println(checker.AllNonNil(3, nilPointer, nil, "test"))                              // Should return false.
+	fmt.Println(checker.NoneNil(3, 22, student{}, "test", 21.23, true, map[string]any{})) // Should return true.
+	fmt.Println(checker.NoneNil(3, nilPointer, nil, "test"))                              // Should return false.
 
 	fmt.Println("AllEmpty results:")
 	fmt.Println(checker.AllEmpty(" ", "", 0, []int{}, nil, false, student{}, map[string]any{}, 0.0)) // Should return true.
 	fmt.Println(checker.AllEmpty("hello", 10, []int{1, 2, 3}, true, map[string]any{"test": 1}))      // Should return false.
 
 	fmt.Println("AllNotEmpty results:")
-	fmt.Println(checker.AllNotEmpty("hello", 10, []int{1, 2, 3}, true, map[string]any{"test": 1})) // Should return true.
-	fmt.Println(checker.AllNotEmpty(" ", "", 0, []int{}, nil, false, student{}, map[string]any{})) // Should return false.
+	fmt.Println(checker.NoneEmpty("hello", 10, []int{1, 2, 3}, true, map[string]any{"test": 1})) // Should return true.
+	fmt.Println(checker.NoneEmpty(" ", "", 0, []int{}, nil, false, student{}, map[string]any{})) // Should return false.
 }

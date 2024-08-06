@@ -75,6 +75,43 @@ func Contains(a, b any) bool {
 		strings.Contains(reflectValueA.String(), reflectValueB.String())
 }
 
+// NotContains checks if the value 'b' is not contained within the value 'a'.
+// This function uses the 'Contains' function for the check and
+// returns the negation of the result.
+// If 'a' or 'b' is a pointer or interface, it gets the underlying value before checking.
+// If 'a' is a slice or array, it checks if 'b' is included in 'a'.
+// If 'a' is a map, it checks if 'b' is a value in 'a'.
+// If 'a' is a struct, it checks if 'b' is a value of any field in 'a'.
+// If 'a' is a string, it handles 'b' as a string and checks if 'a' contains 'b' as a substring.
+//
+// Parameters:
+//   - a: An interface value that 'b' is checked against. The value should be a slice, array, map, struct, or string.
+//   - b: Any interface value to be checked for its existence in 'a'.
+//
+// Returns:
+//   - bool: A boolean value indicating whether 'b' is not contained within 'a'.
+//
+// Example:
+//
+//	strA := "Hello World"
+//	fmt.Println(NotContains(strA, "Moon"))  // true
+//
+//	sliceB := []int{1, 2, 3, 4}
+//	fmt.Println(NotContains(sliceB, 5))   // true
+//
+//	mapC := map[string]int{"one":1, "two":2, "three":3}
+//	fmt.Println(NotContains(mapC, 4)) // true
+//
+//	type structD struct {
+//	    field1 string
+//	    field2 int
+//	}
+//	s := structD{field1: "John", field2: 30}
+//	fmt.Println(NotContains(s, "Jane"))  // true
+func NotContains(a, b any) bool {
+	return !Contains(a, b)
+}
+
 // ContainsIgnoreCase checks if the provided value 'b' is contained within the value 'a',
 // ignoring case sensitivity. It uses reflection to determine the type of 'a' and performs
 // appropriate checks for string types.
@@ -99,6 +136,31 @@ func ContainsIgnoreCase(a, b any) bool {
 
 	return reflectValueB.Kind() == reflect.String &&
 		strings.Contains(strings.ToLower(reflectValueA.String()), strings.ToLower(reflectValueB.String()))
+}
+
+// NotContainsIgnoreCase determines whether the provided value 'b' is not contained within
+// the value 'a', ignoring case sensitivity.
+// This function is the complement of the ContainsIgnoreCase function, returning its negated result.
+//
+// Parameters:
+//   - a: The value that will be checked to see if it contains 'b'.
+//   - b: The value that we are looking for within 'a'.
+//
+// Returns:
+//   - bool: A boolean value indicating whether 'b' is not found within 'a', disregarding case.
+//
+// Example:
+//
+//	strA := "Hello World"
+//	fmt.Println(NotContainsIgnoreCase(strA, "WORLD")) // false
+//	fmt.Println(NotContainsIgnoreCase(strA, "goodbye")) // true
+//
+// Please note:
+// Depending on the types of 'a' and 'b', the ContainsIgnoreCase function invoked by this
+// function may panic with an error stating "A is nil", or stating "Unsupported type",
+// if 'a' is not a string or cannot be converted to one.
+func NotContainsIgnoreCase(a, b any) bool {
+	return !ContainsIgnoreCase(a, b)
 }
 
 // ContainsKey checks if the provided key 'key' is present in the value 'a'.
@@ -139,6 +201,37 @@ func ContainsKey(a, key any) bool {
 	return reflectValue.Kind() == reflect.Map && reflectValue.MapIndex(reflectKey).IsValid()
 }
 
+// NotContainsKey determines whether a specific 'key' is not present in the given value 'a'.
+// It uses the ContainsKey function to check if the key is present in the value, and returns the negation of its result.
+//
+// Parameters:
+//   - a: Any interface value which is either a map or a struct type to be checked
+//   - key: The key which presence is being checked
+//
+// Returns:
+//   - bool: A boolean value indicating whether the provided key is not present in the value.
+//
+// Panic:
+//   - If 'a' is nil, it panics with the message "A is nil"
+//   - If 'a' is neither a map nor a struct, it panics with a formatted string indicating the unsupported type
+//
+// Example:
+//
+//	mapA := map[string]int{"one": 1, "two": 2, "three": 3}
+//	fmt.Println(NotContainsKey(mapA, "one"))  // false
+//	fmt.Println(NotContainsKey(mapA, "four"))  // true
+//
+//	structA := struct {
+//	    field1 int
+//	    field2 string
+//	}
+//	s := structA{field1: 1, field2: "value"}
+//	fmt.Println(NotContainsKey(s, "field1")) // false
+//	fmt.Println(NotContainsKey(s, "field3"))  // true
+func NotContainsKey(a, key any) bool {
+	return !ContainsKey(a, key)
+}
+
 // ContainsOnSlice checks if the provided value 'b' is found by the 'found' function when applied to the elements in the slice 'a'.
 // It iterates over each element in 'a' and calls the 'found' function with the index and element as arguments.
 // If 'found' returns true for any element, the function returns true.
@@ -161,6 +254,31 @@ func ContainsOnSlice[T any](a []T, found func(index int, element T) bool) bool {
 		}
 	}
 	return false
+}
+
+// NotContainsOnSlice checks if the provided value 'b' is not present in the slice 'a'.
+// It utilizes the ContainsOnSlice function to seek for the value and negates its result.
+//
+// Parameters:
+//   - a: A slice of any type 'T' where we want to check the lack of 'b'.
+//   - found: A higher order function that takes an index and an element of type 'T'
+//     from the array and returns a boolean result.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the value is not present in the slice.
+//
+// Example:
+//
+//	elements := []int{1, 2, 3, 4, 5}
+//	fmt.Println(NotContainsOnSlice(elements, func(index int, element int) bool {
+//	    return element > 3
+//	}))  // false
+//
+//	fmt.Println(NotContainsOnSlice(elements, func(index int, element int) bool {
+//	    return element == 10
+//	}))  // true
+func NotContainsOnSlice[T any](a []T, found func(index int, element T) bool) bool {
+	return !ContainsOnSlice(a, found)
 }
 
 // validateContainsParams validates the value 'a' to ensure it is a supported type for
