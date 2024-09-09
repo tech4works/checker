@@ -279,6 +279,31 @@ func IsEmail(a any) bool {
 	return regex.MatchString(toString(a))
 }
 
+// IsNotEmail verifies whether a given value is not a valid email. It invokes the IsEmail function
+// to check the value and flips its returned result.
+//
+// Parameters:
+//   - a: Any interface value to be checked for valid email.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the value is not an email.
+//
+// Panic:
+//   - The function might panic if the passed value is of an unsupported type.
+//     If the value is not of a string, numeric, bool, array, slice, map, struct, interface, or pointer type.
+//
+// Example:
+//
+//	var x string = "test@example.com"
+//	y := 12345
+//	fmt.Println(IsNotEmail(x)) // false
+//	fmt.Println(IsNotEmail(y)) // true
+//	fmt.Println(IsNotEmail([]int{1, 2, 3})) // panic
+//	fmt.Println(IsNotEmail(nil)) // panic
+func IsNotEmail(a any) bool {
+	return !IsEmail(a)
+}
+
 // IsDocument determines the type of document (CPF or CNPJ) and checks the value based on the document type.
 // It uses the Document custom type to determine the document type, then uses the IsCPF or the IsCNPJ function
 // to check if the value is valid for the specified document type.
@@ -562,6 +587,30 @@ func IsFullName(a any) bool {
 	split := strings.Fields(s)
 	regex := regexp.MustCompile(`^[\p{L}\s'-]+$`)
 	return len(split) > 1 && IsNotEmpty(s) && regex.MatchString(s)
+}
+
+// IsNotFullName checks if a given value is not considered a full name. It uses the IsFullName function
+// to check if the value is a full name and returns the negation of its result.
+//
+// Parameters:
+//   - a: Any interface value to be checked.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the value is not a full name.
+//
+// Panic:
+//   - The function may panic if an unsupported value is passed to the IsFullName function.
+//     Specifically, if the value is not of a string, numeric, bool, array, slice, map, struct,
+//     interface, or pointer type, IsFullName will panic, and so will IsNotFullName.
+//
+// Example:
+//
+//	name := "John Doe"
+//	invalidName := "John"
+//	fmt.Println(IsNotFullName(name)) // false
+//	fmt.Println(IsNotFullName(invalidName)) // true
+func IsNotFullName(a any) bool {
+	return !IsFullName(a)
 }
 
 // IsIOSDeviceID determines whether a given value adheres to the standard UUID format typically used in iOS device IDs.

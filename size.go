@@ -107,6 +107,34 @@ func IsLengthEquals(a, b any) bool {
 	return toLength(a) == toLength(b)
 }
 
+// IsLengthNotEquals checks if the lengths or sizes of two parameters, a and b, are not equal.
+// It uses the toLen function to get the lengths of the parameters, which supports various data types.
+// Unlike IsLengthEquals, this function returns true if the lengths or sizes of a and b do not match.
+//
+// Parameters:
+//   - a: The first parameter to compare the length. It can be of any type supported by the toLen function.
+//   - b: The second parameter to compare the length. It must be of a type similar to a for the comparison to be relevant.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the lengths/sizes of the two parameters do not match.
+//
+// Panics:
+//
+//	May panic if the parameters are of unsupported types or if the channel, interface, or pointer is nil.
+//
+// Example:
+//
+//	var a string = "test"
+//	var b string = "hello"
+//	fmt.Println(IsLengthNotEquals(a,b)) // true
+//
+//	var x int = 3
+//	var y int = 4
+//	fmt.Println(IsLengthNotEquals(x,y)) // true
+func IsLengthNotEquals(a, b any) bool {
+	return !IsLengthEquals(a, b)
+}
+
 // IsLengthGreaterThan compares the length or size of two values of any type and returns whether the first value is
 // greater than the second value.
 // It uses the toLen function to get the length of the values, which supports various data types.
