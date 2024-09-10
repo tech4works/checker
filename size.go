@@ -71,7 +71,7 @@ func IsGreaterThanOrEqual(a, b any) bool {
 //
 // Returns true if the first value is less than the second value, false otherwise.
 func IsLessThan(a, b any) bool {
-	return !IsGreaterThan(a, b)
+	return toFloat(a) < toFloat(b)
 }
 
 // IsLessThanOrEqual compares two values of any type and returns whether the first value is less than or equal to the
