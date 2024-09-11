@@ -54,7 +54,7 @@ func IsGreaterThan(a, b any) bool {
 //
 // Returns true if the first value is greater than or equal to the second value, false otherwise.
 func IsGreaterThanOrEqual(a, b any) bool {
-	return IsGreaterThan(a, b) || Equals(a, b)
+	return toFloat(a) >= toFloat(b)
 }
 
 // IsLessThan compares two values of any type and returns whether the first value is less than the second value.
@@ -89,7 +89,7 @@ func IsLessThan(a, b any) bool {
 // Returns true if the first value is less than or equal to the second value, false otherwise.
 // The function is composed of the IsLessThan and the Equals functions.
 func IsLessThanOrEqual(a, b any) bool {
-	return IsLessThan(a, b) || Equals(a, b)
+	return toFloat(a) <= toFloat(b)
 }
 
 // IsLengthEquals checks whether the length or size of two parameters, a and b, are equal.

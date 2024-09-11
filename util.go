@@ -53,6 +53,9 @@ func toFloat(a any) float64 {
 		return float64(reflectValue.Uint())
 	case reflect.Float32, reflect.Float64:
 		return reflectValue.Float()
+	case reflect.Complex64, reflect.Complex128:
+		c := reflectValue.Complex()
+		return real(c) + imag(c)
 	case reflect.Interface, reflect.Pointer:
 		if reflectValue.IsNil() {
 			panic("Error convert interface/pointer to float, it is null!")

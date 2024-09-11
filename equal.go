@@ -56,6 +56,9 @@ func Equals(a, b any) bool {
 		return Equals(a, reflectValueB.Elem().Interface())
 	}
 
+	if isNumeric(reflectValueA.Kind()) && isNumeric(reflectValueB.Kind()) {
+		return toFloat(reflectValueA.Interface()) == toFloat(reflectValueB.Interface())
+	}
 	return reflect.DeepEqual(a, b)
 }
 
@@ -224,5 +227,16 @@ func validateEqualsIgnoreCaseParams(a any) {
 		panic("A is nil")
 	} else if reflectValueA.Kind() != reflect.String && reflectValueA.Kind() != reflect.Ptr {
 		panic(fmt.Sprintf("Unsupported type: %s", reflectValueA.Kind().String()))
+	}
+}
+
+func isNumeric(kind reflect.Kind) bool {
+	switch kind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+		reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128:
+		return true
+	default:
+		return false
 	}
 }
