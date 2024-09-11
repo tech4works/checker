@@ -501,6 +501,28 @@ func IsBearer(a any) bool {
 	return len(split) > 0 && split[0] == bearer
 }
 
+// IsValidIP checks whether a given value can be parsed as a valid IP address. It uses the net.ParseIP function
+// to parse the value and checks if the returned IP is not nil.
+//
+// Parameters:
+//   - a: Any value to be checked for validity as an IP address. The value is first converted to a string using the toString function.
+//
+// Returns:
+//   - bool: A boolean value indicating whether the value can be parsed as a valid IP address.
+//
+// Panics:
+//   - If the provided value cannot be converted to a string using the toString function, a panic is thrown.
+//
+// Example:
+//
+//	var x string = "192.0.2.0"
+//	var y int = 1234567890
+//	fmt.Println(IsValidIP(x)) // true
+//	fmt.Println(IsValidIP(y)) // false
+func IsValidIP(a any) bool {
+	return net.ParseIP(toString(a)) != nil
+}
+
 // IsPrivateIP determines whether the provided IP address is a private IP address.
 // The function considers both IPv4 and IPv6 ranges for the check.
 // It uses net.ParseCIDR to get the IP blocks of reserved private and local IPs.
