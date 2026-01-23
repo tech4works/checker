@@ -607,7 +607,7 @@ func IsPrivateIP(a any) bool {
 func IsFullName(a any) bool {
 	s := toString(a)
 	split := strings.Fields(s)
-	regex := regexp.MustCompile(`^[\p{L}\s'-]+$`)
+	regex := regexp.MustCompile(`^[\p{L}\s'-.]+$`)
 	return len(split) > 1 && IsNotEmpty(s) && regex.MatchString(s)
 }
 
