@@ -23,7 +23,10 @@
 package checker
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
+	"io"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -49,7 +52,7 @@ import (
 //	fmt.Println(IsJSON(jsonArray)) // Outputs: true
 //	fmt.Println(IsJSON(notJson)) // Outputs: false
 func IsJSON(a any) bool {
-	return IsMap(a) || IsSlice(a)
+	return json.Valid(toBytes(a))
 }
 
 // IsNotJSON checks if the given value cannot be a JSON format, either a map or a slice.
@@ -72,6 +75,73 @@ func IsJSON(a any) bool {
 //	fmt.Println(IsNotJSON(notJson)) // Outputs: true
 func IsNotJSON(a any) bool {
 	return !IsJSON(a)
+}
+
+// IsXML checks whether the given value contains a well-formed XML payload.
+// It supports string and []byte inputs. For any other type, it returns false.
+//
+// The function validates XML structure using xml.Decoder and iterating over tokens.
+// If the entire document is successfully parsed without structural errors,
+// and the parser reaches io.EOF, the XML is considered valid.
+//
+// Important:
+//   - This function validates only well-formed XML (syntax correctness).
+//   - It does NOT validate against XML Schema (XSD) or DTD.
+//   - It does NOT validate business or semantic correctness.
+//   - If the input cannot be converted to bytes, the underlying toBytes function may panic.
+//
+// Returns:
+//   - bool: true if the input represents a well-formed XML document, false otherwise.
+//
+// Example:
+//
+//	validXML := `<root><item>1</item></root>`
+//	invalidXML := `<root><item></root>`
+//	notXML := `just a string`
+//
+//	fmt.Println(IsXML(validXML))   // true
+//	fmt.Println(IsXML(invalidXML)) // false
+//	fmt.Println(IsXML(notXML))     // false
+func IsXML(a any) bool {
+	dec := xml.NewDecoder(bytes.NewReader(toBytes(a)))
+	for {
+		_, err := dec.Token()
+		if err == nil {
+			continue
+		}
+		if err == io.EOF {
+			return true
+		}
+		return false
+	}
+}
+
+// IsNotXML checks whether the given value does NOT contain a well-formed XML payload.
+// It internally calls IsXML and returns the negation of its result.
+//
+// The function supports string and []byte inputs.
+// For unsupported types, IsXML returns false, therefore IsNotXML returns true.
+//
+// Important:
+//   - This function only checks XML well-formedness (syntax).
+//   - It does NOT validate against XML Schema (XSD) or DTD.
+//   - It does NOT validate semantic correctness.
+//   - If the input cannot be converted to bytes, the underlying toBytes function may panic.
+//
+// Returns:
+//   - bool: true if the input is not a well-formed XML document, false otherwise.
+//
+// Example:
+//
+//	validXML := `<root><item>1</item></root>`
+//	invalidXML := `<root><item></root>`
+//	notXML := `just a string`
+//
+//	fmt.Println(IsNotXML(validXML))   // false
+//	fmt.Println(IsNotXML(invalidXML)) // true
+//	fmt.Println(IsNotXML(notXML))     // true
+func IsNotXML(a any) bool {
+	return !IsXML(a)
 }
 
 // IsMap determines whether a given value is a map type.
